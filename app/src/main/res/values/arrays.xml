@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="channel">
+        <item>2 Channel</item>
+        <item>4 Channel</item>
+        <item>8 Channel</item>
+        <item>16 Channel</item>
+        <item>32 Channel</item>
+    </string-array>
+
+
+    <string-array name="mode">
+        <item>CLICK</item>
+        <item>TOUCH</item>
+    </string-array>
+
+</resources>

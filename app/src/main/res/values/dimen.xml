@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="status_bar_height">24dp</dimen>
+    <dimen name="top_bar_height">45dp</dimen>
+
+    <dimen name="radius_small">5dp</dimen>
+    <dimen name="radius_big">10dp</dimen>
+
+    <dimen name="bg_height">180dp</dimen>
+</resources>

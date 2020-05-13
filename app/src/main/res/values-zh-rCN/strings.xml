@@ -1,0 +1,73 @@
+<resources>
+    <string name="app_name">KBOX Smart</string>
+    <string name="key_sp">normal_config</string>
+
+    <string name="home">首页</string>
+
+    <string name="sort">排序</string>
+
+    <string name="device">设备</string>
+    <string name="edit">编辑</string>
+    <string name="setting">设置</string>
+    <string name="pic">设备图标</string>
+
+    <string name="scene">场景模式</string>
+    <string name="scene_edit">编辑场景模式</string>
+    <string name="scene_new">创建场景模式</string>
+    <string name="version">版本</string>
+
+
+    <string name="Name">名称</string>
+    <string name="name">名称</string>
+
+    <string name="InPutName1">输入端口1</string>
+    <string name="InPutName2">输入端口2</string>
+    <string name="InPutName3">输入端口3</string>
+    <string name="InPutName4">输入端口4</string>
+    <string name="InPutName5">输入端口5</string>
+    <string name="InPutName6">输入端口6</string>
+    <string name="InPutName7">输入端口7</string>
+    <string name="InPutName8">输入端口8</string>
+
+    <string name="Icon">图标</string>
+    <string name="icon">图标</string>
+
+    <string name="touch_icon">触控图标</string>
+
+    <string name="ctl_mode">控制模式</string>
+
+    <string name="again">再按一次退出.</string>
+
+    <string name="name_not_empty">名称不能为空!</string>
+
+    <string name="cancel">取消</string>
+    <string name="confirm">确认</string>
+    <string name="complete">完成</string>
+
+    <string name="Message">消息</string>
+    <string name="message_delete">是否删除该设备?</string>
+    <string name="message_delete_scene">是否删除该场景?</string>
+
+    <string name="add_already">请勿重复添加该设备.</string>
+
+
+    <string name="ip_input">请输入IP地址.</string>
+    <string name="port_input">请输入端口号.</string>
+
+    <string name="ip_alert">请输入有效的IP地址.</string>
+    <string name="port_alert">请输入有效的端口号.</string>
+    <string name="address_alert">地址无效.</string>
+    <string name="device_alert">请添加设备.</string>
+
+    <string name="connect_fail">连接失败</string>
+    <string name="ui_fail">UI线程不能发送数据.</string>
+    <string name="ui_fail2">UI线程不能建立连接.</string>
+
+    <string name="add_device">添加设备</string>
+    <string name="add_scene">添加场景</string>
+    <string name="select_device">选择设备</string>
+    <string name="scene_name">场景名称</string>
+    <string name="scene_name_input">请输入场景名称.</string>
+    <string name="state">状态</string>
+
+</resources>

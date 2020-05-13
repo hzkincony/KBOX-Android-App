@@ -1,0 +1,77 @@
+<resources>
+    <string name="app_name">KBOX Smart</string>
+    <string name="key_sp">normal_config</string>
+
+    <string name="home">Home</string>
+    <string name="sort">Sort</string>
+
+
+
+    <string name="device">Device</string>
+    <string name="edit">Edit</string>
+    <string name="setting">Setting</string>
+    <string name="pic">Device Pic</string>
+
+    <string name="scene">Scene Mode</string>
+    <string name="scene_edit">Edit Scene Mode</string>
+    <string name="scene_new">Create Scene Mode</string>
+    <string name="version">Version</string>
+
+
+    <string name="Name">Name</string>
+    <string name="name">name</string>
+
+    <string name="InPutName1">Input1</string>
+    <string name="InPutName2">Input2</string>
+    <string name="InPutName3">Input3</string>
+    <string name="InPutName4">Input4</string>
+    <string name="InPutName5">Input5</string>
+    <string name="InPutName6">Input6</string>
+    <string name="InPutName7">Input7</string>
+    <string name="InPutName8">Input8</string>
+
+    <string name="Icon">Icon</string>
+    <string name="icon">icon</string>
+
+    <string name="touch_icon">Touch Icon</string>
+
+    <string name="ctl_mode">Control Mode</string>
+
+    <string name="again">Press again to exit.</string>
+
+    <string name="name_not_empty">Name can\'t be empty!</string>
+
+    <string name="cancel">Cancel</string>
+    <string name="confirm">OK</string>
+    <string name="complete">Save</string>
+
+    <string name="Message">Message</string>
+    <string name="message_delete">Are you sure you want to delete?</string>
+    <string name="message_delete_scene">Are you sure you want to delete?</string>
+
+    <string name="add_already">The device has been added.</string>
+
+
+    <string name="ip_input">Please enter IP address.</string>
+    <string name="port_input">Please enter PORT.</string>
+
+    <string name="ip_alert">Please enter a valid IP address.</string>
+    <string name="port_alert">Please enter a valid PORT address.</string>
+    <string name="address_alert">Please enter a valid address.</string>
+    <string name="device_alert">Please add device.</string>
+
+    <string name="connect_fail">Connect fail</string>
+    <string name="ui_fail">UI thread cannot send data.</string>
+    <string name="ui_fail2">UI thread cannot establish connection.</string>
+
+
+    <string name="add_device">Add Device</string>
+    <string name="add_scene">Add Scene</string>
+
+    <string name="select_device">Select Device</string>
+    <string name="scene_name">Scene Name</string>
+    <string name="scene_name_input">Please input Scene Name.</string>
+
+    <string name="state">State</string>
+
+</resources>

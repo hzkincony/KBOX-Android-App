@@ -1,0 +1,6 @@
+.gradle
+.idea
+/build
+kbox.zip
+kbox.iml
+*.iml
