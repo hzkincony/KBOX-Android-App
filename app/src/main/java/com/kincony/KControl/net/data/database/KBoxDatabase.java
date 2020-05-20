@@ -12,7 +12,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {Device.class, IPAddress.class, Scene.class}, version = 3, exportSchema = false)
+@Database(entities = {Device.class, IPAddress.class, Scene.class}, version = 4, exportSchema = false)
 public abstract class KBoxDatabase extends RoomDatabase {
     public static final String DB_NAME = "CompanyDatabase.db";
     private static volatile KBoxDatabase instance;
@@ -43,6 +43,14 @@ public abstract class KBoxDatabase extends RoomDatabase {
                                 "device_id INTEGER NOT NULL," +
                                 "name TEXT NOT NULL," +
                                 "\'action\' INTEGER NOT NULL)");
+                    }
+                },new Migration(3, 4) {
+                    @Override
+                    public void migrate(SupportSQLiteDatabase database) {
+                        database.execSQL("ALTER TABLE device add itemName VARCHAR DEFAULT null");
+                        database.execSQL("ALTER TABLE device add type INTEGER not null DEFAULT 0");
+                        database.execSQL("ALTER TABLE device add body INTEGER not null DEFAULT 0");
+                        database.execSQL("ALTER TABLE device add path INTEGER not null DEFAULT 0");
                     }
                 })
                 .build();

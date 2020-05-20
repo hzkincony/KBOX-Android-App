@@ -285,7 +285,31 @@ class HomeFragment : BaseFragment() {
         for (i in 1..model) {
             list.add(Device(temp, i, size + index++))
         }
-        list.add(Device(temp, model + 1, size + index++, 1))
+
+        var itemName: String?
+        when(model) {
+            2 -> {
+                itemName = getInPutState(0)
+            }
+            4 -> {
+                itemName = getInPutState(8)
+            }
+            8 -> {
+                itemName = getInPutState(8)
+            }
+            16 -> {
+                itemName = getInPutState(8)
+            }
+            32 -> {
+                itemName = getInPutState(6)
+            }
+            else -> {
+                itemName = getInPutState(0)
+            }
+        }
+
+
+        list.add(Device(temp, model + 1, size + index++, 1, model, itemName))
         KBoxDatabase.getInstance(context).deviceDao.insertDevice(list)
 
         var readList = KBoxDatabase.getInstance(context).deviceDao.allDevice
@@ -301,6 +325,23 @@ class HomeFragment : BaseFragment() {
         deviceList.clear()
         deviceList.addAll(readList)
         adapter?.notifyDataSetChanged()
+    }
+
+    fun getInPutState(num: Int):String? {
+        var itemName: String? = null
+
+        if (num > 0) {
+            for (i in 1..num) {
+                if (itemName == null) itemName = "";
+                itemName += resources.getString(R.string.InPutName) + i + ";";
+            }
+
+            if (itemName != null) {
+                itemName = itemName.substring(0, itemName.length - 1);
+            }
+        }
+
+        return itemName
     }
 
     override fun onPause() {
@@ -482,9 +523,9 @@ class HomeFragment : BaseFragment() {
                         EventBus.getDefault().post(UpdateDeviceUI(true))
 
 //                        thread(start = true) {
-                            if(flag) {
-                                getStateList()
-                            }
+                        if(flag) {
+                            getStateList()
+                        }
 //                        }
 
                     }
@@ -634,7 +675,7 @@ class HomeFragment : BaseFragment() {
 
                 }
                 .setPositiveButton(resources.getString(R.string.confirm)) { _, _ ->
-//                    if (!IPUtils.isIp(ip.text.toString())) {
+                    //                    if (!IPUtils.isIp(ip.text.toString())) {
 //                        showToast(resources.getString(R.string.ip_alert))
 //                        return@setPositiveButton
 //                    }

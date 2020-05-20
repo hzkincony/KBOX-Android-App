@@ -29,10 +29,10 @@ android {
             storePassword 'kcontrol'
         }
         debug {
-            keyAlias 'kcontrol'
-            keyPassword 'kcontrol'
-            storeFile file('../app/kcontrol.jks')
-            storePassword 'kcontrol'
+//            keyAlias 'kcontrol'
+//            keyPassword 'kcontrol'
+//            storeFile file('../app/kcontrol.jks')
+//            storePassword 'kcontrol'
         }
     }
 

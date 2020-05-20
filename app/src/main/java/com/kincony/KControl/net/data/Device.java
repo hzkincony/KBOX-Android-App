@@ -79,7 +79,15 @@ public class Device {
     @ColumnInfo(name = "itemName")
     public String itemName;
 
+    /**
+     * data
+     */
     public int body;
+
+    /**
+     * path
+     */
+    public int path;
 
     public Device() {
     }
@@ -91,48 +99,22 @@ public class Device {
         this.name = IPUtils.INSTANCE.getDefaultName(address, number);
         this.index = index;
         this.type = 0;
-        this.itemName = getInPutState(0);
+        this.itemName = null;
+        this.body = 0;
+        this.path = 0;
     }
 
-    public Device(IPAddress address, int number, int index, int type) {
+    public Device(IPAddress address, int number, int index, int type, int path, String itemName) {
         this.address = address;
         this.addressId = address.getId();
         this.number = number;
         this.name = IPUtils.INSTANCE.getDefaultName(address, number);
         this.index = index;
         this.type = type;
-        switch (address.getPort()) {
-            case 4102:
-                this.itemName = getInPutState(0);
-                break;
-            case 4104:
-                this.itemName = getInPutState(8);
-                break;
-            case 4108:
-                this.itemName = getInPutState(8);
-                break;
-            case 4116:
-                this.itemName = getInPutState(8);
-                break;
-            case 4132:
-                this.itemName = getInPutState(6);
-                break;
-        }
-
-
+        this.body = 0;
+        this.path = path;
+        this.itemName = itemName;
     }
 
-    public String getInPutState(int num){
-        String itemName = null;
-        for (int i=0 ; i<num ; i++) {
-            if (itemName == null) itemName = "";
-            itemName += "输入端" + (i+1) + ";";
-        }
-        if (itemName != null) {
-            itemName = itemName.substring(0, itemName.length()-1);
-        }
-
-        return itemName;
-    }
 
 }

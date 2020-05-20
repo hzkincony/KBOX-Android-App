@@ -20,6 +20,7 @@
     <string name="Name">名称</string>
     <string name="name">名称</string>
 
+    <string name="InPutName">输入端口</string>
     <string name="InPutName1">输入端口1</string>
     <string name="InPutName2">输入端口2</string>
     <string name="InPutName3">输入端口3</string>

@@ -84,7 +84,7 @@
     <LinearLayout
         android:id="@+id/root1"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="90dp"
         android:gravity="center_vertical"
         android:orientation="vertical"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -132,7 +132,7 @@
 
                 <View
                     android:id="@+id/view1_1"
-                    android:background="@drawable/shape_circle_view_red"
+                    android:background="@drawable/shape_circle_view_green"
                     android:layout_width="10dp"
                     android:layout_height="10dp"/>
 
@@ -156,7 +156,7 @@
 
                 <View
                     android:id="@+id/view1_2"
-                    android:background="@drawable/shape_circle_view_red"
+                    android:background="@drawable/shape_circle_view_green"
                     android:layout_width="10dp"
                     android:layout_height="10dp"/>
 
@@ -180,7 +180,7 @@
 
                 <View
                     android:id="@+id/view1_3"
-                    android:background="@drawable/shape_circle_view_red"
+                    android:background="@drawable/shape_circle_view_green"
                     android:layout_width="10dp"
                     android:layout_height="10dp"/>
 
@@ -204,7 +204,7 @@
 
                 <View
                     android:id="@+id/view1_4"
-                    android:background="@drawable/shape_circle_view_red"
+                    android:background="@drawable/shape_circle_view_green"
                     android:layout_width="10dp"
                     android:layout_height="10dp"/>
 
@@ -228,7 +228,7 @@
 
                 <View
                     android:id="@+id/view1_5"
-                    android:background="@drawable/shape_circle_view_red"
+                    android:background="@drawable/shape_circle_view_green"
                     android:layout_width="10dp"
                     android:layout_height="10dp"/>
 
@@ -252,7 +252,7 @@
 
                 <View
                     android:id="@+id/view1_6"
-                    android:background="@drawable/shape_circle_view_red"
+                    android:background="@drawable/shape_circle_view_green"
                     android:layout_width="10dp"
                     android:layout_height="10dp"/>
 
@@ -276,7 +276,7 @@
 
                 <View
                     android:id="@+id/view1_7"
-                    android:background="@drawable/shape_circle_view_red"
+                    android:background="@drawable/shape_circle_view_green"
                     android:layout_width="10dp"
                     android:layout_height="10dp"/>
 
@@ -300,7 +300,7 @@
 
                 <View
                     android:id="@+id/view1_8"
-                    android:background="@drawable/shape_circle_view_red"
+                    android:background="@drawable/shape_circle_view_green"
                     android:layout_width="10dp"
                     android:layout_height="10dp"/>
 
