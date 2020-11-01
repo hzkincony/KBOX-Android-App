@@ -29,8 +29,8 @@ allprojects {
         maven { url 'https://maven.google.com' }
     }
     ext {
-        versionCode = 8
-        versionName = "1.1.2"
+        versionCode = 9
+        versionName = "1.1.3"
         minSdkVersion = 19
         appSourceCompatibility = "1.8"
         appTargetCompatibility = "1.8"
