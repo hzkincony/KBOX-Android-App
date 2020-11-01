@@ -12,13 +12,13 @@ class IPAddress {
 
     public var port: Int = 0
 
-    public var type: Int = 2
+    public var type: Int = DeviceType.Relay_2.value
 
     constructor() {
 
     }
 
-    constructor(address: String, port: Int, type: Int = 2) {
+    constructor(address: String, port: Int, type: Int) {
         this.ip = address
         this.port = port
         this.type = type

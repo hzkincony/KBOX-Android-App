@@ -71,4 +71,7 @@
     <string name="scene_name_input">请输入场景名称.</string>
     <string name="state">状态</string>
 
+    <string name="unknown_device">未知设备</string>
+    <string name="data_exception_tips">数据异常，开始同步数据！</string>
+
 </resources>

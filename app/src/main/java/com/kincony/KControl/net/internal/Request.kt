@@ -1,7 +1,7 @@
 package com.kincony.KControl.net.internal
 
-import android.util.Log
 import com.kincony.KControl.utils.IPUtils.isIp
+import com.kincony.KControl.utils.LogUtils
 import java.net.InetAddress
 import java.net.InetSocketAddress
 
@@ -26,8 +26,9 @@ class Request {
                             host = "${result[0]}".replace("${host}/", "")
                         }
                     }
-                    Log.e("TAG", "host_${host}")
                 } catch (e: Exception) {
+                    LogUtils.e(e.toString())
+                    LogUtils.e("Network-->ip address error:/${ip}:${port}")
                     throw e
                 }
                 addressOrNull = InetSocketAddress(host, port)

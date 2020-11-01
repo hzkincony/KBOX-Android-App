@@ -1,11 +1,17 @@
 package com.kincony.KControl.net.internal.connection
 
 import android.os.Build
-import com.kincony.KControl.net.internal.*
+import com.kincony.KControl.net.internal.Call
+import com.kincony.KControl.net.internal.Request
+import com.kincony.KControl.net.internal.closeQuietly
 import com.kincony.KControl.net.internal.converter.Converter
+import com.kincony.KControl.net.internal.threadFactory
+import com.kincony.KControl.utils.LogUtils
 import okio.*
 import java.io.IOException
-import java.net.*
+import java.net.ConnectException
+import java.net.InetSocketAddress
+import java.net.Socket
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
@@ -47,6 +53,8 @@ class RealConnection() {
                 inUse = false
             }, 10, TimeUnit.SECONDS)
         } catch (e: IOException) {
+            LogUtils.e(e.toString())
+            LogUtils.e("Network-->Failed to connect to address:${call?.request?.toAddress}")
             throw e
         }
         return this
@@ -59,11 +67,13 @@ class RealConnection() {
         this.rawSocket = rawSocket
         var address = call.request!!.toAddress
         try {
+            LogUtils.d("Network-->Connect to address:${address}")
             connectSocket(
                 rawSocket, address,
                 CONNECT_TIME_OUT
             )
         } catch (e: ConnectException) {
+            LogUtils.e("Network-->Failed to connect to address:${address}:" + e)
             throw ConnectException("Failed to connect to $address").apply {
                 initCause(e)
             }

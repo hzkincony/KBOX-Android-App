@@ -75,4 +75,7 @@
 
     <string name="state">State</string>
 
+    <string name="unknown_device">Unknown Device</string>
+    <string name="data_exception_tips">Data exception, start data synchronization</string>
+
 </resources>

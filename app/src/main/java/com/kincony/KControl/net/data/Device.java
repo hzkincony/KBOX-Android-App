@@ -1,13 +1,14 @@
 package com.kincony.KControl.net.data;
 
-import com.kincony.KControl.R;
-import com.kincony.KControl.utils.IPUtils;
-
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+
+import com.chad.library.adapter.base.entity.MultiItemEntity;
+import com.kincony.KControl.R;
+import com.kincony.KControl.utils.IPUtils;
 
 import static androidx.room.ForeignKey.CASCADE;
 
@@ -20,7 +21,7 @@ import static androidx.room.ForeignKey.CASCADE;
                 parentColumns = "id",
                 childColumns = "address_id",
                 onDelete = CASCADE))
-public class Device {
+public class Device implements MultiItemEntity {
     /**
      * ip地址id
      */
@@ -80,7 +81,8 @@ public class Device {
     public String itemName;
 
     /**
-     * data
+     * 8位继电器开关数据
+     * 比如：0b00000001
      */
     public int body;
 
@@ -88,6 +90,14 @@ public class Device {
      * path
      */
     public int path;
+
+    /**
+     * 状态
+     * 比如调光器：
+     * 字符串为数字是表示单个亮度
+     * 如果数字中间有逗号，表示多个亮度
+     */
+    public String state;
 
     public Device() {
     }
@@ -117,4 +127,8 @@ public class Device {
     }
 
 
+    @Override
+    public int getItemType() {
+        return address == null ? DeviceType.Unknown.getValue() : address.getType();
+    }
 }

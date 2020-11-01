@@ -1,6 +1,9 @@
 package com.kincony.KControl.net
 
-object KBoxCommand {
+/**
+ * 继电器通信协议
+ */
+object KBoxCommand : BaseCommand() {
 
     /**
      * 控制某一路继电器 SET
@@ -67,13 +70,5 @@ object KBoxCommand {
     fun alarmState(number: Int): String {
         return toRequestBody("RELAY-ALARM-$number")
     }
-
-    private fun toRequestBody(string: String) = string
-
-//    private fun toRequestBody(string: String): RequestBody = object : RequestBody() {
-//        override fun body(): String {
-//            return string
-//        }
-//    }
 
 }

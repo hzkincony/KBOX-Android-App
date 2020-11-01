@@ -3,7 +3,7 @@ package com.kincony.KControl.utils
 import android.util.Log
 
 object LogUtils {
-    val TAG: String = "KControl"
+    val TAG: String = "LM"
 
     var DEBUG: Boolean = true
 

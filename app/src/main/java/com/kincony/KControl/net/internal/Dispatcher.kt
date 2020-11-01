@@ -15,7 +15,7 @@ class Dispatcher() {
     }
 
     @get:Synchronized
-    var maxRequests = 64
+    var maxRequests = 1
         set(maxRequests) {
             require(maxRequests >= 1) { "max < 1: $maxRequests" }
             synchronized(this) {
