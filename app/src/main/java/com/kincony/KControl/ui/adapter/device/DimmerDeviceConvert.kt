@@ -90,18 +90,20 @@ class DimmerDeviceConvert(adapter: NewDeviceAdapter) : AbsBaseDeviceConvert(adap
             tvAllBrightness.visibility = View.VISIBLE
 
             tvName.text = device.name
-            if (device.itemName == null) device.itemName =
-                "Input1;Input2;Input3;Input4;Input5;Input6;Input7;Input8"
-            val itemNameList = device.itemName.split(";")
-            val stateList = device.state.split(",")
-            var allBrightnessText = ""
-            if (itemNameList.size == stateList.size) {
-                for ((index, name) in itemNameList.withIndex()) {
-                    if (index != 0) allBrightnessText += "\n"
-                    allBrightnessText += "${name}=${stateList[index]}"
+            if (!TextUtils.isEmpty(device.itemName) && !TextUtils.isEmpty(device.state)) {
+                val itemNameList = device.itemName.split(";")
+                val stateList = device.state.split(",")
+                var allBrightnessText = ""
+                if (itemNameList.size == stateList.size) {
+                    for ((index, name) in itemNameList.withIndex()) {
+                        if (index != 0) allBrightnessText += "\n"
+                        allBrightnessText += "${name}=${stateList[index]}"
+                    }
                 }
+                tvAllBrightness.text = allBrightnessText
+            } else {
+                tvAllBrightness.text = ""
             }
-            tvAllBrightness.text = allBrightnessText
         }
     }
 

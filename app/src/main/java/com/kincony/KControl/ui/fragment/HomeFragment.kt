@@ -320,7 +320,11 @@ class HomeFragment : BaseFragment() {
         val deviceChannelCount = address.type % 10000;
 
         for (i in 1..deviceChannelCount) {
-            list.add(Device(temp, i, size + index++))
+            val channelDevice = Device(temp, i, size + index++)
+            if (DeviceType.Dimmer_8.value == channelDevice.address.type) {
+                channelDevice.state = "0"
+            }
+            list.add(channelDevice)
         }
 
         val itemName: String?
@@ -356,6 +360,9 @@ class HomeFragment : BaseFragment() {
             deviceChannelCount,
             itemName
         )
+        if (DeviceType.Dimmer_8.value == allChannelDevice.address.type) {
+            allChannelDevice.state = "0,0,0,0,0,0,0,0"
+        }
         list.add(allChannelDevice)
         KBoxDatabase.getInstance(context).deviceDao.insertDevice(list)
 
