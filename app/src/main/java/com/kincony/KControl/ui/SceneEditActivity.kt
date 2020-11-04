@@ -13,8 +13,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.kincony.KControl.R
 import com.kincony.KControl.net.data.*
 import com.kincony.KControl.net.data.database.KBoxDatabase
+import com.kincony.KControl.ui.adapter.device.DeviceAdapter
 import com.kincony.KControl.ui.adapter.device.DimmerDeviceConvert
-import com.kincony.KControl.ui.adapter.device.NewDeviceAdapter
+import com.kincony.KControl.ui.adapter.device.RelayDeviceConvert
 import com.kincony.KControl.ui.base.BaseActivity
 import com.kincony.KControl.utils.ImageLoader
 import kotlinx.android.synthetic.main.activity_scene_edit.*
@@ -29,7 +30,7 @@ import kotlin.collections.ArrayList
 class SceneEditActivity : BaseActivity() {
     private var iIcon: Int = 0
     var scene: Scene? = null
-    var adapter: NewDeviceAdapter? = null
+    var adapter: DeviceAdapter? = null
     var list = ArrayList<Device>()
 
     companion object {
@@ -105,35 +106,45 @@ class SceneEditActivity : BaseActivity() {
             }
         }
 
-        adapter = NewDeviceAdapter()
+        adapter = DeviceAdapter()
         recycler.layoutManager = LinearLayoutManager(this)
         recycler.adapter = adapter
         adapter?.setNewInstance(list)
-        adapter?.setOnItemChildClickListener { adapter, view, position ->
-            when (view.id) {
-                R.id.mSwitchClick -> {
-                    val device = list[position]
-                    device.open = !device.open
-                    adapter.notifyItemChanged(position)
-                    val lengthArray = scene!!.length.split("_")
-                    var start = 0
-                    var result = ""
-                    for (i in lengthArray) {
-                        val length = i.toInt()
-                        val deviceChannelList = list.subList(start, start + length)
-                        start += length
-                        if (TextUtils.isEmpty(result)) {
-                            result = actionCode(deviceChannelList, device.address.type)
-                        } else {
-                            result =
-                                "${result}_${actionCode(deviceChannelList, device.address.type)}"
-                        }
+        // 继电器点击事件回调
+        adapter?.relayDeviceConvert?.callback = object : RelayDeviceConvert.Callback {
+            override fun onSceneActionDown(position: Int, device: Device) {
+
+            }
+
+            override fun onSceneActionUp(position: Int, device: Device) {
+            }
+
+            override fun onSwitchClick(position: Int, device: Device) {
+                val lengthArray = scene!!.length.split("_")
+                var start = 0
+                var result = ""
+                for (i in lengthArray) {
+                    val length = i.toInt()
+                    val deviceChannelList = list.subList(start, start + length)
+                    start += length
+                    if (TextUtils.isEmpty(result)) {
+                        result = actionCode(deviceChannelList, device.address.type)
+                    } else {
+                        result =
+                            "${result}_${actionCode(deviceChannelList, device.address.type)}"
                     }
-                    scene!!.action = result
                 }
+                scene!!.action = result
+            }
+
+            override fun onEditClick(position: Int, device: Device) {
+            }
+
+            override fun onInPutEditClick(position: Int, device: Device) {
             }
         }
 
+        // 调光器点击事件回调
         adapter?.dimmerDeviceConvert?.callback = object : DimmerDeviceConvert.Callback {
             override fun onAddClick(position: Int, device: Device) {
                 changeAction(device)
@@ -145,6 +156,14 @@ class SceneEditActivity : BaseActivity() {
 
             override fun onProgressChange(position: Int, device: Device, progress: Int) {
                 changeAction(device)
+            }
+
+            override fun onEditClick(position: Int, device: Device) {
+
+            }
+
+            override fun onInPutEditClick(position: Int, device: Device) {
+
             }
 
             fun changeAction(device: Device) {
@@ -245,7 +264,7 @@ class SceneEditActivity : BaseActivity() {
                 }
                 DeviceType.Dimmer_8.value -> {
                     for ((index, d) in devices.withIndex()) {
-                        d.isTouch = false
+                        d.isTouch = true
                         val subArray = action.split(",")
                         if (d.number >= 0 && d.number < subArray.size) {
                             d.state = subArray[index]
@@ -365,6 +384,7 @@ class SceneEditActivity : BaseActivity() {
                     }
                 })
                 for ((index, device) in deviceChannelSortList.withIndex()) {
+                    if (device.type == 1) continue
                     if (index != 0) {
                         result += ",${device.state}"
                     } else {
@@ -444,7 +464,7 @@ class SceneEditActivity : BaseActivity() {
                 }
             }
 
-            d.isTouch = false
+            d.isTouch = d.address.type == DeviceType.Dimmer_8.value
             d.open = false
         }
         list.addAll(devices)

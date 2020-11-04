@@ -24,21 +24,20 @@ import com.kincony.KControl.net.usecase.KDimmerSetOneDimmerUseCase
 import com.kincony.KControl.ui.DeviceEditActivity
 import com.kincony.KControl.ui.DeviceInPutEditActivity
 import com.kincony.KControl.ui.adapter.HomeSceneAdapter
+import com.kincony.KControl.ui.adapter.device.DeviceAdapter
 import com.kincony.KControl.ui.adapter.device.DimmerDeviceConvert
-import com.kincony.KControl.ui.adapter.device.NewDeviceAdapter
+import com.kincony.KControl.ui.adapter.device.RelayDeviceConvert
 import com.kincony.KControl.ui.base.BaseFragment
 import com.kincony.KControl.utils.KBoxStateRead
-import com.kincony.KControl.utils.LogUtils
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.concurrent.thread
 
 class HomeFragment : BaseFragment() {
     private var deviceList = ArrayList<Device>()
-    private var adapter: NewDeviceAdapter? = null
+    private var adapter: DeviceAdapter? = null
 
     private var sceneList = ArrayList<Scene>()
     private var sceneAdapter: HomeSceneAdapter? = null
@@ -51,35 +50,29 @@ class HomeFragment : BaseFragment() {
     override fun initView() {
         // 下拉刷新
         refresh.setOnRefreshListener {
-            readState(true)
+            getAllDeviceState(true)
         }
 
         // 设备列表
-        adapter = NewDeviceAdapter()
+        adapter = DeviceAdapter()
         recycler.layoutManager = LinearLayoutManager(context)
         recycler.adapter = adapter
         adapter?.setNewInstance(deviceList)
-        // 继电器设备点击事件
-        adapter?.setOnItemChildClickListener { adapter, view, position ->
-            when (view.id) {
-                R.id.mSwitchClick -> {
-                    var device = deviceList[position]
-                    changeKBoxState(device, device.open, position)
-                }
+        // 继电器点击事件
+        adapter?.relayDeviceConvert?.callback = object : RelayDeviceConvert.Callback {
+            override fun onSceneActionDown(position: Int, device: Device) {
+                changeKBoxState(device, true, position)
             }
-        }
-        adapter?.setOnItemClickListener { adapter, view, position ->
-            var device = deviceList[position]
 
-            if (device.type == 1) {
-                DeviceInPutEditActivity.start(
-                    context,
-                    device.deviceId,
-                    device.name,
-                    device.icon,
-                    device.itemName
-                )
-            } else {
+            override fun onSceneActionUp(position: Int, device: Device) {
+                changeKBoxState(device, false, position)
+            }
+
+            override fun onSwitchClick(position: Int, device: Device) {
+                changeKBoxState(device, device.open, position)
+            }
+
+            override fun onEditClick(position: Int, device: Device) {
                 DeviceEditActivity.start(
                     context,
                     device.deviceId,
@@ -90,31 +83,16 @@ class HomeFragment : BaseFragment() {
                 )
             }
 
-            false
-        }
-        adapter?.relayDeviceConvert?.callback = { device, isOpen ->
-            var address = device.address
-            Client.newCall(
-                Request.obtain(
-                    address.ip,
-                    address.port,
-                    KBoxCommand.setState(device.number, if (isOpen) 1 else 0)
+            override fun onInPutEditClick(position: Int, device: Device) {
+                DeviceInPutEditActivity.start(
+                    context,
+                    device.deviceId,
+                    device.name,
+                    device.icon,
+                    device.itemName
                 )
-            )
-                .enqueue(object : Callback {
-                    override fun onStart() {
-                    }
+            }
 
-                    override fun onFailure(e: Exception) {
-                        showToast(e.message)
-                    }
-
-                    override fun onResponse(response: ResponseBody?) {
-                        if (response is KBoxState) {
-                            KBoxStateRead.readOneState(response, device)
-                        }
-                    }
-                })
         }
         // 调光器点击事件
         adapter?.dimmerDeviceConvert?.callback = object : DimmerDeviceConvert.Callback {
@@ -129,6 +107,27 @@ class HomeFragment : BaseFragment() {
             override fun onProgressChange(position: Int, device: Device, progress: Int) {
                 setDimmerState(position, device)
             }
+
+            override fun onEditClick(position: Int, device: Device) {
+                DeviceEditActivity.start(
+                    context,
+                    device.deviceId,
+                    device.name,
+                    device.icon,
+                    device.isTouch,
+                    device.iconTouch
+                )
+            }
+
+            override fun onInPutEditClick(position: Int, device: Device) {
+                DeviceInPutEditActivity.start(
+                    context,
+                    device.deviceId,
+                    device.name,
+                    device.icon,
+                    device.itemName
+                )
+            }
         }
 
         // 情景模式列表
@@ -137,14 +136,12 @@ class HomeFragment : BaseFragment() {
         scene.adapter = sceneAdapter
         sceneAdapter?.setNewInstance(sceneList)
         sceneAdapter?.setOnItemClickListener { adapter, view, position ->
-            LogUtils.d("setOnItemClickListener")
             val scene = sceneList[position]
             if (!scene.isTouch) {
                 onScene(scene)
             }
         }
         sceneAdapter?.callback = { scene, b ->
-            LogUtils.d("setOnItemClickListener callback")
             val interval = System.currentTimeMillis() - lastSceneMillis
             if (interval > 250) {
                 lastSceneMillis = System.currentTimeMillis()
@@ -243,9 +240,17 @@ class HomeFragment : BaseFragment() {
 
     @Subscribe
     public fun updateDeviceUI(event: UpdateDeviceUI) {
-        if (event.flag) {
-            adapter?.notifyItemRangeChanged(0, deviceList.size)
+        if (getAllDeviceStateCount == 0) {
             refresh.isRefreshing = false
+        }
+        if (event.ipAddress != null) {
+            for ((index, device) in deviceList.withIndex()) {
+                if (device.address.ip == event.ipAddress!!.ip) {
+                    adapter?.notifyItemChanged(index)
+                }
+            }
+        } else {
+            adapter?.notifyItemRangeChanged(0, deviceList.size)
         }
     }
 
@@ -287,8 +292,7 @@ class HomeFragment : BaseFragment() {
 
         deviceList.addAll(devices)
         adapter?.notifyDataSetChanged()
-        refresh.isRefreshing = true
-        readState(true)
+        getAllDeviceState(true)
     }
 
     /**
@@ -323,6 +327,7 @@ class HomeFragment : BaseFragment() {
             val channelDevice = Device(temp, i, size + index++)
             if (DeviceType.Dimmer_8.value == channelDevice.address.type) {
                 channelDevice.state = "0"
+                channelDevice.isTouch = true
             }
             list.add(channelDevice)
         }
@@ -352,18 +357,29 @@ class HomeFragment : BaseFragment() {
             }
         }
 
-        val allChannelDevice = Device(
-            temp,
-            deviceChannelCount + 1,
-            size + index,
-            1,
-            deviceChannelCount,
-            itemName
-        )
-        if (DeviceType.Dimmer_8.value == allChannelDevice.address.type) {
-            allChannelDevice.state = "0,0,0,0,0,0,0,0"
+        if (DeviceType.Dimmer_8.value != address.type) {
+            val allChannelDevice = Device(
+                temp,
+                deviceChannelCount + 1,
+                size + index,
+                1,
+                deviceChannelCount,
+                itemName
+            )
+            list.add(allChannelDevice)
+        } else if (DeviceType.Dimmer_8.value == address.type) {
+//            调光模式不要多加一个总的item
+//            val allChannelDevice = Device(
+//                temp,
+//                deviceChannelCount + 1,
+//                size + index,
+//                1,
+//                deviceChannelCount,
+//                itemName
+//            )
+//            allChannelDevice.state = "0,0,0,0,0,0,0,0"
+//            list.add(allChannelDevice)
         }
-        list.add(allChannelDevice)
         KBoxDatabase.getInstance(context).deviceDao.insertDevice(list)
 
         val readList = KBoxDatabase.getInstance(context).deviceDao.allDevice
@@ -379,6 +395,8 @@ class HomeFragment : BaseFragment() {
         deviceList.clear()
         deviceList.addAll(readList)
         adapter?.notifyDataSetChanged()
+
+        getAllDeviceState(true)
     }
 
     fun getInPutState(num: Int): String? {
@@ -471,20 +489,16 @@ class HomeFragment : BaseFragment() {
                     )
                     Client.newCall(request).enqueue(object : Callback {
                         override fun onStart() {
-                            showLoading()
                         }
 
                         override fun onFailure(e: Exception) {
                             showToast(e.message)
-                            closeLoading()
                         }
 
                         override fun onResponse(response: ResponseBody?) {
                             if (response is KBoxState) {
-                                KBoxStateRead.readAllState(response, dsTemp[0].address, deviceList)
+                                getAllRelayState(dsTemp[0].address)
                             }
-                            adapter?.notifyDataSetChanged()
-                            closeLoading()
                         }
                     })
                 }
@@ -500,9 +514,10 @@ class HomeFragment : BaseFragment() {
 
         for ((index, item) in sceneAddress.withIndex()) {
             val addressIp = item.split(":")[0]
+            val addressPort = item.split(":")[1].toInt()
             var address: IPAddress? = null
             for (d in deviceList) {
-                if (d.address.ip == addressIp) {
+                if (d.address.ip == addressIp && d.address.port == addressPort) {
                     address = d.address
                     break
                 }
@@ -536,20 +551,16 @@ class HomeFragment : BaseFragment() {
                     );
                     Client.newCall(request).enqueue(object : Callback {
                         override fun onStart() {
-                            showLoading()
                         }
 
                         override fun onFailure(e: Exception) {
                             showToast(e.message)
-                            closeLoading()
                         }
 
                         override fun onResponse(response: ResponseBody?) {
                             if (response is KBoxState) {
-                                KBoxStateRead.readAllState(response, address, deviceList)
+                                getAllRelayState(address)
                             }
-                            adapter?.notifyDataSetChanged()
-                            closeLoading()
                         }
 
                     })
@@ -620,6 +631,7 @@ class HomeFragment : BaseFragment() {
                     }
                 })
                 for ((index, device) in deviceChannelSortList.withIndex()) {
+                    if (device.type == 1) continue
                     if (index != 0) {
                         result += ",${device.state}"
                     } else {
@@ -636,40 +648,30 @@ class HomeFragment : BaseFragment() {
         return Math.pow(2 * 1.0, number * 1.0).toInt()
     }
 
-    private fun readState(flag: Boolean) {
-        var allAddress = KBoxDatabase.getInstance(context).addressDao.allAddress
-        for (address in allAddress) {
-            if (address.type == DeviceType.Dimmer_8.value) {
-                getAllDimmerState(address)
-                continue
-            }
-            Client.newCall(Request.obtain(address.ip, address.port, KBoxCommand.readAllState()))
-                .enqueue(object : Callback {
-                    override fun onStart() {
-                        if (flag) refresh.isRefreshing = true
-                    }
+    var getAllDeviceStateCount: Int = 0
 
-                    override fun onFailure(e: Exception) {
-                        showToast(e.message)
-                        refresh.isRefreshing = false
-                    }
+    private fun getAllDeviceState(isRefresh: Boolean) {
+        if (getAllDeviceStateCount > 0) return
 
-                    override fun onResponse(response: ResponseBody?) {
-                        if (response is KBoxState) {
-                            KBoxStateRead.readAllState(response, address, deviceList)
-                        }
-
-                        EventBus.getDefault().post(UpdateDeviceUI(true))
-
-                        if (flag) {
-                            getStateList()
-                        }
-
-                    }
-                })
-        }
+        val allAddress = KBoxDatabase.getInstance(context).addressDao.allAddress
         if (allAddress.size == 0) {
             refresh.isRefreshing = false
+            return
+        }
+
+        getAllDeviceStateCount = allAddress.size
+
+        refresh.isRefreshing = isRefresh
+
+        for (address in allAddress) {
+            when (address.type) {
+                DeviceType.Relay_2.value,
+                DeviceType.Relay_4.value,
+                DeviceType.Relay_8.value,
+                DeviceType.Relay_16.value,
+                DeviceType.Relay_32.value -> getAllRelayState(address) { --getAllDeviceStateCount }
+                DeviceType.Dimmer_8.value -> getAllDimmerState(address) { --getAllDeviceStateCount }
+            }
         }
     }
 
@@ -693,7 +695,7 @@ class HomeFragment : BaseFragment() {
                     if (response is KBoxState) {
                         KBoxStateRead.readAllState(response, address, deviceList)
                     }
-                    EventBus.getDefault().post(UpdateDeviceUI(true))
+                    EventBus.getDefault().post(UpdateDeviceUI())
                 }
             })
 
@@ -704,8 +706,8 @@ class HomeFragment : BaseFragment() {
      * 改变继电器状态
      */
     private fun changeKBoxState(device: Device, open: Boolean, position: Int) {
-        var command = KBoxCommand.setState(device.number, if (open) 0 else 1)
-        var address = device.address
+        val command = KBoxCommand.setState(device.number, if (open) 1 else 0)
+        val address = device.address
         val request = Request.obtain(address.ip, address.port, command)
         Client.newCall(request).enqueue(object : Callback {
             override fun onStart() {
@@ -716,16 +718,9 @@ class HomeFragment : BaseFragment() {
             }
 
             override fun onResponse(response: ResponseBody?) {
-                if (response is KBoxState) {
-                    KBoxStateRead.readOneState(response, device)
-                }
-                adapter?.notifyItemChanged(position)
-                //读取按钮状态，循环三次每次间隔500ms
-                thread(start = true) {
-                    for (i in 1..2) {
-                        Thread.sleep(100)
-                        readState(false)
-                    }
+                if (response is KBoxState && !response.succeed) {
+                    // 调光器数据异常，重新读取
+                    showToast(getString(R.string.data_exception_tips))
                 }
             }
         })
@@ -759,7 +754,42 @@ class HomeFragment : BaseFragment() {
             })
     }
 
-    fun getAllDimmerState(address: IPAddress) {
+    /**
+     * 读取继电器全部通道状态
+     */
+    private fun getAllRelayState(
+        address: IPAddress,
+        onFinish: (() -> Unit)? = null
+    ) {
+        val request = Request.obtain(address.ip, address.port, KBoxCommand.readAllState());
+        Client.newCall(request).enqueue(object : Callback {
+            override fun onStart() {
+
+            }
+
+            override fun onFailure(e: Exception) {
+                onFinish?.invoke()
+                showToast(e.message)
+                EventBus.getDefault().post(UpdateDeviceUI())
+            }
+
+            override fun onResponse(response: ResponseBody?) {
+                onFinish?.invoke()
+                if (response is KBoxState && response.succeed) {
+                    KBoxStateRead.readAllState(response, address, deviceList)
+                    EventBus.getDefault().post(UpdateDeviceUI())
+                }
+            }
+        })
+    }
+
+    /**
+     * 读取调光器全部通道状态
+     */
+    fun getAllDimmerState(
+        address: IPAddress,
+        onFinish: (() -> Unit)? = null
+    ) {
         if (address.type != DeviceType.Dimmer_8.value) return
         KDimmerReadAllDimmerUseCase().execute(address, object : Callback {
             override fun onStart() {
@@ -767,10 +797,13 @@ class HomeFragment : BaseFragment() {
             }
 
             override fun onFailure(e: Exception) {
-
+                onFinish?.invoke()
+                showToast(e.message)
+                EventBus.getDefault().post(UpdateDeviceUI())
             }
 
             override fun onResponse(response: ResponseBody?) {
+                onFinish?.invoke()
                 if (response is KBoxState && response.succeed) {
                     val stateArray = response.body().split(",")
                     for (temp in deviceList) {
@@ -782,7 +815,7 @@ class HomeFragment : BaseFragment() {
                             }
                         }
                     }
-                    updateDeviceUI(UpdateDeviceUI())
+                    EventBus.getDefault().post(UpdateDeviceUI())
                 }
             }
         })
@@ -851,7 +884,7 @@ class HomeFragment : BaseFragment() {
     /**
      * 情景模式拖拽ItemTouchHelper.Callback
      */
-    inner class HelperCallback(var adapter: NewDeviceAdapter?, var list: ArrayList<Device>) :
+    inner class HelperCallback(var adapter: DeviceAdapter?, var list: ArrayList<Device>) :
         ItemTouchHelper.Callback() {
         override fun onSwiped(p0: RecyclerView.ViewHolder, p1: Int) {
         }
@@ -860,8 +893,8 @@ class HomeFragment : BaseFragment() {
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder
         ): Int {
-            var swipFlag = 0;
-            var dragflag = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            val swipFlag = 0;
+            val dragflag = ItemTouchHelper.UP or ItemTouchHelper.DOWN
             return makeMovementFlags(dragflag, swipFlag)
         }
 

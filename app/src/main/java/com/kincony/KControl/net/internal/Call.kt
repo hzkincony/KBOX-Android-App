@@ -4,9 +4,9 @@ import com.kincony.KControl.net.internal.connection.RealConnectionPool
 import com.kincony.KControl.net.internal.converter.Converter
 import com.kincony.KControl.net.internal.interfaces.Callback
 import com.kincony.KControl.net.internal.interfaces.ResponseBody
+import com.kincony.KControl.utils.LogUtils
 import java.io.IOException
 import java.io.InterruptedIOException
-import java.lang.Exception
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.RejectedExecutionException
 
@@ -34,8 +34,7 @@ class Call(
     internal fun getResponse(): ResponseBody? {
         var realConnection = RealConnectionPool.getRealConnection(this@Call)
         var result = realConnection.request(factory).syncReadConnect()
-        return factory?.responseBodyConverter()?.convert(result)
-
+        return factory?.responseBodyConverter()?.convert(request?.toAddress, result)
     }
 
 
@@ -73,35 +72,20 @@ class Call(
 
         override fun run() {
             threadName("Call $host ${request?.request}") {
-                var signalledCallback = false
                 try {
                     val response = getResponse()
-                    signalledCallback = true
                     Dispatcher.MAIN.post {
                         if (response?.isSucceed() == true) {
                             responseCallback.onResponse(response)
                         } else {
-                            responseCallback.onFailure(Exception("ERROR"))
+                            responseCallback.onFailure(Exception("RESPONSE ERROR"))
                         }
-                    }
-                } catch (e: IOException) {
-                    if (signalledCallback) {
-//                        Platform.get().log("Callback failure for ${toLoggableString()}", Platform.INFO, e)
-                    } else {
-                    }
-                    Dispatcher.MAIN.post {
-                        responseCallback.onFailure(e)
                     }
                 } catch (t: Throwable) {
-                    if (!signalledCallback) {
-                        val canceledException = IOException("canceled due to $t")
-                        canceledException.addSuppressed(t)
-                        responseCallback.onFailure(canceledException)
-                        Dispatcher.MAIN.post {
-                            responseCallback.onFailure(canceledException)
-                        }
+                    LogUtils.e("Network${request?.toAddress}-->Catch error address:${t}")
+                    Dispatcher.MAIN.post {
+                        responseCallback.onFailure(Exception(t))
                     }
-                    throw t
                 } finally {
                     client?.dispatcher?.finished(this)
                 }

@@ -1,26 +1,19 @@
 package com.kincony.KControl.net.internal.connection
 
-import android.util.Log
 import com.kincony.KControl.net.internal.Call
 
 object RealConnectionPool {
-    private var list = arrayListOf<RealConnection>()
+    private var realConnectionMap = HashMap<String, RealConnection>()
 
     @Synchronized
     fun getRealConnection(call: Call): RealConnection {
-        var temp: RealConnection? = null
-
-        for (connection in list) {
-            if (call.host == connection.lastHost && !connection.inUse) {
-                temp = connection
-                temp.setNextCall(call)
-                break
-            }
+        var realConnection: RealConnection? = realConnectionMap[call.host]
+        if (realConnection != null && !realConnection.inUse) {
+            realConnection.setNextCall(call)
+        } else {
+            realConnection = RealConnection().setNextCall(call)
+            realConnectionMap[call.host] = realConnection
         }
-        if (temp == null) {
-            temp = RealConnection().setNextCall(call)
-            list.add(temp)
-        }
-        return temp!!
+        return realConnection
     }
 }

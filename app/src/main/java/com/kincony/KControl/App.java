@@ -1,8 +1,9 @@
 package com.kincony.KControl;
 
 import android.app.Application;
+import android.util.Log;
 
-//import com.tencent.bugly.Bugly;
+import com.kincony.KControl.utils.LogUtils;
 
 public class App extends Application {
     public static Application application;
@@ -10,8 +11,13 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        this.application = this;
-//        Bugly.init(getApplicationContext(), "a75454c189", BuildConfig.DEBUG);
-//        Bugly.init(getApplicationContext(), "a75454c189", false);
+        application = this;
+
+        Thread.UncaughtExceptionHandler defaultHandler = Thread.getDefaultUncaughtExceptionHandler();
+        Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+            LogUtils.INSTANCE.e(t.toString());
+            LogUtils.INSTANCE.e(Log.getStackTraceString(e));
+            defaultHandler.uncaughtException(t, e);
+        });
     }
 }

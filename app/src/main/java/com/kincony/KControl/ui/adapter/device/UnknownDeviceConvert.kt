@@ -4,7 +4,7 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.kincony.KControl.R
 import com.kincony.KControl.net.data.Device
 
-class UnknownDeviceConvert(adapter: NewDeviceAdapter) : AbsBaseDeviceConvert(adapter) {
+class UnknownDeviceConvert(adapter: DeviceAdapter) : AbsBaseDeviceConvert(adapter) {
     override fun getLayoutId(): Int = R.layout.item_device_unknonw
 
     override fun convert(baseViewHolder: BaseViewHolder, device: Device) {

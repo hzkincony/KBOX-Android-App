@@ -9,7 +9,7 @@ import com.kincony.KControl.net.data.Device
 import com.kincony.KControl.net.data.DeviceType
 import java.util.concurrent.Executors
 
-class NewDeviceAdapter : BaseMultiItemQuickAdapter<Device, BaseViewHolder>() {
+class DeviceAdapter : BaseMultiItemQuickAdapter<Device, BaseViewHolder>() {
     var isSort = false
 
     companion object {

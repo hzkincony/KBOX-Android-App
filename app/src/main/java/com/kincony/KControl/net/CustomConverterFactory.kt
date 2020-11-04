@@ -6,6 +6,7 @@ import com.kincony.KControl.net.internal.converter.Converter
 import com.kincony.KControl.net.internal.interfaces.ResponseBody
 import com.kincony.KControl.utils.LogUtils
 import org.greenrobot.eventbus.EventBus
+import java.net.InetSocketAddress
 import kotlin.concurrent.thread
 
 class CustomConverterFactory private constructor() : Converter.Factory() {
@@ -40,7 +41,7 @@ class CustomConverterFactory private constructor() : Converter.Factory() {
     var requestId = "id-${System.currentTimeMillis()}"
 
     override fun requestBodyConverter(): Converter<String, String> {
-//        requestId = "id-${System.currentTimeMillis()}"
+        requestId = "id-${System.currentTimeMillis()}"
         return CustomRequestConverter(requestId)
     }
 
@@ -49,8 +50,8 @@ class CustomConverterFactory private constructor() : Converter.Factory() {
     }
 
     class CustomRequestConverter(val requestId: String) : Converter<String, String> {
-        override fun convert(value: String?): String? {
-            LogUtils.d("Network-->Request-${requestId}:${value}")
+        override fun convert(address: InetSocketAddress?, value: String?): String? {
+            LogUtils.d("Network${address}-->Request [${requestId}]=[${value}]")
             return value
         }
     }
@@ -88,8 +89,8 @@ class CustomConverterFactory private constructor() : Converter.Factory() {
      *  8 路：RELAY-STATE-255,D0,OK/ERROR
      */
     class CustomResponseConverter(val requestId: String) : Converter<String, ResponseBody> {
-        override fun convert(valueString: String?): ResponseBody? {
-            LogUtils.d("Network-->Response-${requestId}:${valueString}")
+        override fun convert(address: InetSocketAddress?, valueString: String?): ResponseBody? {
+            LogUtils.d("Network${address}-->Response[${requestId}]=[${valueString}]")
             var value = valueString?.replace(zero, "")
             var result = value?.split(",")
             if (result == null || result.size <= 1) return null

@@ -1,24 +1,9 @@
 package com.kincony.KControl.net
 
-import com.kincony.KControl.utils.SPUtils
-
 /**
  * 以太网通信调光协议
  */
 object KDimmerCommand : BaseCommand() {
-
-    /**
-     * 调光指令间隔，默认300
-     */
-    var DIMMER_COMMAND_INTERVAL_MILLIS: Int = 300
-        get() {
-            return SPUtils.normalConfig.getInt("DIMMER_COMMAND_INTERVAL_MILLIS", field)
-        }
-        set(value) {
-            field = value
-            SPUtils.normalConfig.edit().putInt("DIMMER_COMMAND_INTERVAL_MILLIS", field).commit()
-        }
-
 
     /**
      * 查询某一路当前亮度状态：0-99%

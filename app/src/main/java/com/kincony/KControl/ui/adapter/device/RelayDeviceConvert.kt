@@ -4,6 +4,8 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.SwitchCompat
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.kincony.KControl.R
@@ -12,45 +14,55 @@ import com.kincony.KControl.utils.ImageLoader
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
-class RelayDeviceConvert(adapter: NewDeviceAdapter) : AbsBaseDeviceConvert(adapter) {
+class RelayDeviceConvert(adapter: DeviceAdapter) : AbsBaseDeviceConvert(adapter) {
     private var task: ScheduledFuture<*>? = null
-    var callback: ((Device, Boolean) -> Unit)? = null
-
-    init {
-        adapter.addChildClickViewIds(R.id.mSwitchClick)
-        adapter.addChildLongClickViewIds(R.id.button)
-    }
 
     override fun getLayoutId(): Int = R.layout.item_device
 
     override fun convert(baseViewHolder: BaseViewHolder, device: Device) {
+        val root = baseViewHolder.getView<LinearLayout>(R.id.root)
+        val root1 = baseViewHolder.getView<LinearLayout>(R.id.root1)
+        val mSwitch = baseViewHolder.getView<SwitchCompat>(R.id.mSwitch)
+        val button = baseViewHolder.getView<AppCompatImageView>(R.id.button)
+        val mSwitchClick = baseViewHolder.getView<LinearLayout>(R.id.mSwitchClick)
+        val value = baseViewHolder.getView<TextView>(R.id.value)
+        val value1 = baseViewHolder.getView<TextView>(R.id.value1)
+        val icon = baseViewHolder.getView<ImageView>(R.id.icon)
+        val icon1 = baseViewHolder.getView<ImageView>(R.id.icon1)
+
         when (device.type) {
             0 -> {
-                baseViewHolder.getView<LinearLayout>(R.id.root).visibility = View.VISIBLE
-                baseViewHolder.getView<LinearLayout>(R.id.root1).visibility = View.GONE
-                baseViewHolder.getView<SwitchCompat>(R.id.mSwitch).isChecked = device.open
-                baseViewHolder.getView<SwitchCompat>(R.id.mSwitch).isClickable = false
+                root.visibility = View.VISIBLE
+                root1.visibility = View.GONE
+                mSwitch.isChecked = device.open
+                mSwitch.isClickable = false
 
-                baseViewHolder.setGone(R.id.button, adapter.isSort || !device.isTouch)
-                baseViewHolder.setGone(R.id.mSwitchClick, adapter.isSort || device.isTouch)
+                button.visibility =
+                    if (adapter.isSort || !device.isTouch) View.GONE else View.VISIBLE
+                mSwitchClick.visibility =
+                    if (adapter.isSort || device.isTouch) View.GONE else View.VISIBLE
 
-                baseViewHolder.setText(R.id.value, device.name)
+                value.text = device.name
 
-                ImageLoader.load(adapter.mContext, device.icon, baseViewHolder.getView(R.id.icon))
-                ImageLoader.load(
-                    adapter.mContext,
-                    device.iconTouch,
-                    baseViewHolder.getView(R.id.button)
-                )
+                ImageLoader.load(adapter.mContext, device.icon, icon)
+                ImageLoader.load(adapter.mContext, device.iconTouch, button)
 
+                mSwitchClick.setOnClickListener() {
+                    device.open = !device.open
+                    baseViewHolder.getView<SwitchCompat>(R.id.mSwitch).isChecked = device.open
+                    callback?.onSwitchClick(baseViewHolder.adapterPosition, device)
+                }
 
-                baseViewHolder.getView<ImageView>(R.id.button).setOnTouchListener { _, event ->
+                button.setOnTouchListener { _, event ->
                     when (event?.action) {
                         MotionEvent.ACTION_DOWN -> {
-                            task = NewDeviceAdapter.service.schedule({
+                            task = DeviceAdapter.service.schedule({
                                 task = null
-                                NewDeviceAdapter.MAIN.post {
-                                    callback?.invoke(device, true)
+                                DeviceAdapter.MAIN.post {
+                                    callback?.onSceneActionDown(
+                                        baseViewHolder.adapterPosition,
+                                        device
+                                    )
                                 }
                             }, 250, TimeUnit.MILLISECONDS)
                             return@setOnTouchListener false
@@ -61,11 +73,14 @@ class RelayDeviceConvert(adapter: NewDeviceAdapter) : AbsBaseDeviceConvert(adapt
                         MotionEvent.ACTION_UP -> {
                             task?.cancel(false)
                             if (task == null) {
-                                NewDeviceAdapter.service.schedule({
-                                    NewDeviceAdapter.MAIN.post {
-                                        callback?.invoke(device, false)
+                                DeviceAdapter.service.schedule({
+                                    DeviceAdapter.MAIN.post {
+                                        callback?.onSceneActionUp(
+                                            baseViewHolder.adapterPosition,
+                                            device
+                                        )
                                     }
-                                }, 200, TimeUnit.MILLISECONDS)
+                                }, 250, TimeUnit.MILLISECONDS)
                             }
                             return@setOnTouchListener false
                         }
@@ -73,11 +88,14 @@ class RelayDeviceConvert(adapter: NewDeviceAdapter) : AbsBaseDeviceConvert(adapt
                             task?.cancel(false)
                             if (task == null) {
 
-                                NewDeviceAdapter.service.schedule({
-                                    NewDeviceAdapter.MAIN.post {
-                                        callback?.invoke(device, false)
+                                DeviceAdapter.service.schedule({
+                                    DeviceAdapter.MAIN.post {
+                                        callback?.onSceneActionUp(
+                                            baseViewHolder.adapterPosition,
+                                            device
+                                        )
                                     }
-                                }, 200, TimeUnit.MILLISECONDS)
+                                }, 250, TimeUnit.MILLISECONDS)
 
 //                        callback?.invoke(device, false)
                             }
@@ -89,12 +107,16 @@ class RelayDeviceConvert(adapter: NewDeviceAdapter) : AbsBaseDeviceConvert(adapt
                         }
                     }
                 }
+                value.setOnClickListener {
+                    callback?.onEditClick(baseViewHolder.adapterPosition, device)
+                }
+                baseViewHolder.itemView.setOnClickListener(null)
             }
             1 -> {
-                baseViewHolder.getView<LinearLayout>(R.id.root).visibility = View.GONE
-                baseViewHolder.getView<LinearLayout>(R.id.root1).visibility = View.VISIBLE
-                baseViewHolder.setText(R.id.value1, device.name)
-                ImageLoader.load(adapter.mContext, device.icon, baseViewHolder.getView(R.id.icon1))
+                root.visibility = View.GONE
+                root1.visibility = View.VISIBLE
+                value1.text = device.name
+                ImageLoader.load(adapter.mContext, device.icon, icon1)
 
                 val itemName: List<String>
                 if (device.itemName != null) {
@@ -216,8 +238,24 @@ class RelayDeviceConvert(adapter: NewDeviceAdapter) : AbsBaseDeviceConvert(adapt
                     baseViewHolder.getView<View>(R.id.view1_8)
                         .setBackgroundResource(R.drawable.shape_circle_view_red)
                 }
-
+                baseViewHolder.itemView.setOnClickListener() {
+                    callback?.onInPutEditClick(baseViewHolder.adapterPosition, device)
+                }
             }
         }
+    }
+
+    var callback: Callback? = null
+
+    interface Callback {
+        fun onSceneActionDown(position: Int, device: Device)
+
+        fun onSceneActionUp(position: Int, device: Device)
+
+        fun onSwitchClick(position: Int, device: Device)
+
+        fun onEditClick(position: Int, device: Device)
+
+        fun onInPutEditClick(position: Int, device: Device)
     }
 }

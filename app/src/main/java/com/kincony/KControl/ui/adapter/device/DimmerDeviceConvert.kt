@@ -11,7 +11,7 @@ import com.kincony.KControl.R
 import com.kincony.KControl.net.data.Device
 import com.kincony.KControl.utils.ImageLoader
 
-class DimmerDeviceConvert(adapter: NewDeviceAdapter) : AbsBaseDeviceConvert(adapter) {
+class DimmerDeviceConvert(adapter: DeviceAdapter) : AbsBaseDeviceConvert(adapter) {
 
     override fun getLayoutId(): Int = R.layout.item_device_dimmer
 
@@ -36,7 +36,7 @@ class DimmerDeviceConvert(adapter: NewDeviceAdapter) : AbsBaseDeviceConvert(adap
             ivAdd.setOnClickListener {
                 if (!TextUtils.isEmpty(device.state)) {
                     val newState = device.state.toInt() + 1
-                    if (newState <= 100) {
+                    if (newState < 100) {
                         device.state = "$newState"
                         tvBrightness.text = device.state
                         updateAllChannelDeviceItem(device)
@@ -55,6 +55,7 @@ class DimmerDeviceConvert(adapter: NewDeviceAdapter) : AbsBaseDeviceConvert(adap
                     }
                 }
             }
+            seekBar.max = 99
             seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 var isUserTouch = false
 
@@ -63,7 +64,7 @@ class DimmerDeviceConvert(adapter: NewDeviceAdapter) : AbsBaseDeviceConvert(adap
                     progress: Int,
                     fromUser: Boolean
                 ) {
-                    if (isUserTouch && !TextUtils.isEmpty(device.state) && progress >= 0 && progress <= 100) {
+                    if (isUserTouch && !TextUtils.isEmpty(device.state) && progress >= 0 && progress < 100) {
                         device.state = "$progress"
                         tvBrightness.text = device.state
                         updateAllChannelDeviceItem(device)
@@ -82,6 +83,11 @@ class DimmerDeviceConvert(adapter: NewDeviceAdapter) : AbsBaseDeviceConvert(adap
             if (!TextUtils.isEmpty(device.state)) {
                 seekBar.progress = device.state.toInt()
             }
+
+            tvName.setOnClickListener {
+                callback?.onEditClick(baseViewHolder.adapterPosition, device)
+            }
+            baseViewHolder.itemView.setOnClickListener(null)
         } else if (device.type == 1) {
             ivAdd.visibility = View.GONE
             ivSubtract.visibility = View.GONE
@@ -103,6 +109,11 @@ class DimmerDeviceConvert(adapter: NewDeviceAdapter) : AbsBaseDeviceConvert(adap
                 tvAllBrightness.text = allBrightnessText
             } else {
                 tvAllBrightness.text = ""
+            }
+
+            tvName.setOnClickListener(null)
+            baseViewHolder.itemView.setOnClickListener() {
+                callback?.onInPutEditClick(baseViewHolder.adapterPosition, device)
             }
         }
     }
@@ -134,5 +145,9 @@ class DimmerDeviceConvert(adapter: NewDeviceAdapter) : AbsBaseDeviceConvert(adap
         fun onSubClick(position: Int, device: Device)
 
         fun onProgressChange(position: Int, device: Device, progress: Int)
+
+        fun onEditClick(position: Int, device: Device)
+
+        fun onInPutEditClick(position: Int, device: Device)
     }
 }

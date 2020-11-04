@@ -2,18 +2,15 @@ package com.kincony.KControl.ui.base
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.kincony.KControl.R
+import com.kincony.KControl.utils.ToastUtils
 
 open abstract class BaseFragment : Fragment() {
-    var mHandler = Handler()
     var loadingCreate = false
     val loading by lazy {
         loadingCreate = true
@@ -75,13 +72,7 @@ open abstract class BaseFragment : Fragment() {
 
 
     fun showToast(msg: String?) {
-        if (Looper.getMainLooper() == Looper.myLooper()) {
-            Toast.makeText(context, msg ?: "", Toast.LENGTH_SHORT).show()
-        } else {
-            mHandler.post {
-                Toast.makeText(context, msg ?: "", Toast.LENGTH_SHORT).show()
-            }
-        }
+        ToastUtils.showToastShort(msg)
     }
 
 }

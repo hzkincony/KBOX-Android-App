@@ -17,6 +17,8 @@
 
 package com.kincony.KControl.net.internal
 
+import okio.*
+import okio.ByteString.Companion.decodeHex
 import java.io.Closeable
 import java.io.IOException
 import java.io.InterruptedIOException
@@ -25,25 +27,12 @@ import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketTimeoutException
 import java.nio.charset.Charset
-import java.nio.charset.StandardCharsets.UTF_16BE
-import java.nio.charset.StandardCharsets.UTF_16LE
-import java.nio.charset.StandardCharsets.UTF_8
-import java.util.Arrays
-import java.util.Collections
-import java.util.Comparator
-import java.util.LinkedHashMap
-import java.util.Locale
-import java.util.TimeZone
+import java.nio.charset.StandardCharsets.*
+import java.util.*
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.TimeUnit
 import kotlin.text.Charsets.UTF_32BE
 import kotlin.text.Charsets.UTF_32LE
-import okio.Buffer
-import okio.BufferedSink
-import okio.BufferedSource
-import okio.ByteString.Companion.decodeHex
-import okio.Options
-import okio.Source
 
 @JvmField
 val EMPTY_BYTE_ARRAY = ByteArray(0)
@@ -475,30 +464,6 @@ inline fun Any.notify() = (this as Object).notify()
 
 @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN", "NOTHING_TO_INLINE")
 inline fun Any.notifyAll() = (this as Object).notifyAll()
-
-fun <T> readFieldOrNull(instance: Any, fieldType: Class<T>, fieldName: String): T? {
-    var c: Class<*> = instance.javaClass
-    while (c != Any::class.java) {
-        try {
-            val field = c.getDeclaredField(fieldName)
-            field.isAccessible = true
-            val value = field.get(instance)
-            return if (!fieldType.isInstance(value)) null else fieldType.cast(value)
-        } catch (_: NoSuchFieldException) {
-        }
-
-        c = c.superclass
-    }
-
-    // Didn't find the field we wanted. As a last gasp attempt,
-    // try to find the value on a delegate.
-    if (fieldName != "delegate") {
-        val delegate = readFieldOrNull(instance, Any::class.java, "delegate")
-        if (delegate != null) return readFieldOrNull(delegate, fieldType, fieldName)
-    }
-
-    return null
-}
 
 internal fun <E> MutableList<E>.addIfAbsent(element: E) {
     if (!contains(element)) add(element)

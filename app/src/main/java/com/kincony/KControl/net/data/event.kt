@@ -22,6 +22,4 @@ class IconEvent(var icon: Int, var code: Int)
 
 class AlarmEvent(var ip: String, var port: Int)
 
-class UpdateDeviceUI(
-    var flag: Boolean = true
-)
+class UpdateDeviceUI(var ipAddress: IPAddress? = null)

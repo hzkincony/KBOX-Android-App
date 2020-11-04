@@ -1,15 +1,12 @@
 package com.kincony.KControl.net.internal.connection
 
-import android.os.Build
 import com.kincony.KControl.net.internal.Call
 import com.kincony.KControl.net.internal.Request
-import com.kincony.KControl.net.internal.closeQuietly
 import com.kincony.KControl.net.internal.converter.Converter
 import com.kincony.KControl.net.internal.threadFactory
 import com.kincony.KControl.utils.LogUtils
 import okio.*
 import java.io.IOException
-import java.net.ConnectException
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.util.concurrent.Executors
@@ -35,28 +32,29 @@ class RealConnection() {
         return this
     }
 
+    @Throws
     fun request(factory: Converter.Factory? = null): RealConnection {
-        try {
-            task?.cancel(false)
-            if (rawSocket?.isConnected != true) {
-                connectSocket(call)
-            }
-            sendRequest(call?.request, factory)
-            task = executor.schedule({
-                rawSocket?.closeQuietly()
-                call?.request?.clearUse()
-                call?.request?.recycle()
-                call?.request = null
-                rawSocket = null
-                source = null
-                sink = null
-                inUse = false
-            }, 10, TimeUnit.SECONDS)
-        } catch (e: IOException) {
-            LogUtils.e(e.toString())
-            LogUtils.e("Network-->Failed to connect to address:${call?.request?.toAddress}")
-            throw e
+        task?.cancel(false)
+        if (rawSocket?.isConnected != true) {
+            connectSocket(call)
         }
+        sendRequest(call?.request, factory)
+        task = executor.schedule({
+            try {
+                rawSocket?.close()
+                LogUtils.d("Network${call?.request?.toAddress}-->Close socket success")
+            } catch (t: Throwable) {
+                LogUtils.e(t.toString())
+                LogUtils.d("Network${call?.request?.toAddress}-->Failed to close socket")
+            }
+            call?.request?.clearUse()
+            call?.request?.recycle()
+            call?.request = null
+            rawSocket = null
+            source = null
+            sink = null
+            inUse = false
+        }, AUTO_CLOSE_SOCKET_TIME_OUT, TimeUnit.MILLISECONDS)
         return this
     }
 
@@ -65,27 +63,14 @@ class RealConnection() {
         if (call?.request == null) return
         val rawSocket = SocketFactory.getDefault().createSocket()!!
         this.rawSocket = rawSocket
-        var address = call.request!!.toAddress
-        try {
-            LogUtils.d("Network-->Connect to address:${address}")
-            connectSocket(
-                rawSocket, address,
-                CONNECT_TIME_OUT
-            )
-        } catch (e: ConnectException) {
-            LogUtils.e("Network-->Failed to connect to address:${address}:" + e)
-            throw ConnectException("Failed to connect to $address").apply {
-                initCause(e)
-            }
-        }
-        try {
-            source = rawSocket.source().buffer()
-            sink = rawSocket.sink().buffer()
-        } catch (npe: NullPointerException) {
-            if (npe.message == NPE_THROW_WITH_NULL) {
-                throw IOException(npe)
-            }
-        }
+        val address = call.request!!.toAddress
+        LogUtils.d("Network${address}-->start connect to address")
+        connectSocket(
+            rawSocket, address,
+            CONNECT_TIME_OUT
+        )
+        source = rawSocket.source().buffer()
+        sink = rawSocket.sink().buffer()
     }
 
     @Throws(IOException::class)
@@ -96,7 +81,8 @@ class RealConnection() {
         codec = ExchangeCodec(source, sink)
         source.timeout().timeout(READ_TIME_OUT, TimeUnit.MILLISECONDS)
         sink.timeout().timeout(WRITE_TIME_OUT, TimeUnit.MILLISECONDS)
-        var requestBody = factory?.requestBodyConverter()?.convert(request?.request)
+        var requestBody =
+            factory?.requestBodyConverter()?.convert(request?.toAddress, request?.request)
         codec?.writeRequest(requestBody)
         codec?.finishRequest()
     }
@@ -113,15 +99,7 @@ class RealConnection() {
         address: InetSocketAddress,
         connectTimeout: Int = CONNECT_TIME_OUT
     ) {
-        try {
-            socket.connect(address, connectTimeout)
-        } catch (e: ClassCastException) {
-            if (Build.VERSION.SDK_INT == 26) {
-                throw IOException("Exception in connect", e)
-            } else {
-                throw e
-            }
-        }
+        socket.connect(address, connectTimeout)
     }
 
     companion object {
@@ -130,7 +108,9 @@ class RealConnection() {
             Executors.newScheduledThreadPool(1, threadFactory("Dispatcher", false))
         var READ_TIME_OUT = 30 * 1000L
         var WRITE_TIME_OUT = 30 * 1000L
-        var CONNECT_TIME_OUT = 30 * 1000
+        var CONNECT_TIME_OUT = 5 * 1000
+        var AUTO_CLOSE_SOCKET_TIME_OUT =
+            CONNECT_TIME_OUT + READ_TIME_OUT + WRITE_TIME_OUT + 1000
     }
 
 }

@@ -28,7 +28,7 @@ class Request {
                     }
                 } catch (e: Exception) {
                     LogUtils.e(e.toString())
-                    LogUtils.e("Network-->ip address error:/${ip}:${port}")
+                    LogUtils.e("Network/${ip}:${port}-->ip address error")
                     throw e
                 }
                 addressOrNull = InetSocketAddress(host, port)

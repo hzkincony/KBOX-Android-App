@@ -1,6 +1,5 @@
 package com.kincony.KControl.ui.base
 
-import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -9,10 +8,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.kincony.KControl.R
+import com.kincony.KControl.utils.ToastUtils
 
 open abstract class BaseActivity : AppCompatActivity() {
     var mHandler = Handler()
-    val sp by lazy { getSharedPreferences(getString(R.string.key_sp), Context.MODE_PRIVATE) }
 
     var canLoad = true
     var loadingCreate = false
@@ -20,9 +19,9 @@ open abstract class BaseActivity : AppCompatActivity() {
         loadingCreate = true
         val view = LayoutInflater.from(this).inflate(R.layout.dialog_loading, null)
         AlertDialog.Builder(this, R.style.AppTheme_Transparent)
-                .setCancelable(true)
-                .setView(view)
-                .create()
+            .setCancelable(true)
+            .setView(view)
+            .create()
     }
 
     open fun showLoading() {
@@ -32,17 +31,6 @@ open abstract class BaseActivity : AppCompatActivity() {
     open fun closeLoading() {
         loading?.dismiss()
     }
-
-    @Synchronized
-    fun setValue(key: String, value: String?) {
-        sp.edit().putString(key, value).commit()
-    }
-
-    @Synchronized
-    fun getValue(key: String, dfValue: String = ""): String {
-        return sp.getString(key, dfValue)
-    }
-
 
     fun showToast(msg: String?) {
         if (Looper.getMainLooper() == Looper.myLooper()) {
@@ -75,5 +63,6 @@ open abstract class BaseActivity : AppCompatActivity() {
                 loading?.cancel()
             }
         }
+        ToastUtils.destroy(this)
     }
 }
