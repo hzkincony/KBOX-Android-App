@@ -44,8 +44,7 @@ class RealConnection() {
                 rawSocket?.close()
                 LogUtils.d("Network${call?.request?.toAddress}-->Close socket success")
             } catch (t: Throwable) {
-                LogUtils.e(t.toString())
-                LogUtils.d("Network${call?.request?.toAddress}-->Failed to close socket")
+                LogUtils.e("Network/${call?.request?.ip}:${call?.request?.port}-->Failed to close socket")
             }
             call?.request?.clearUse()
             call?.request?.recycle()

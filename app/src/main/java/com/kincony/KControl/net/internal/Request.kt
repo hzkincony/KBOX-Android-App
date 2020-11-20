@@ -27,7 +27,6 @@ class Request {
                         }
                     }
                 } catch (e: Exception) {
-                    LogUtils.e(e.toString())
                     LogUtils.e("Network/${ip}:${port}-->ip address error")
                     throw e
                 }

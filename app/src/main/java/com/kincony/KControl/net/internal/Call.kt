@@ -82,7 +82,7 @@ class Call(
                         }
                     }
                 } catch (t: Throwable) {
-                    LogUtils.e("Network${request?.toAddress}-->Catch error address:${t}")
+                    LogUtils.e("Network/${request?.ip}:${request?.port}-->Catch error address:${t}")
                     Dispatcher.MAIN.post {
                         responseCallback.onFailure(Exception(t))
                     }
