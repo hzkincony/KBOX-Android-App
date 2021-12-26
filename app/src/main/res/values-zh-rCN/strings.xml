@@ -73,5 +73,7 @@
 
     <string name="unknown_device">未知设备</string>
     <string name="data_exception_tips">数据异常，开始同步数据！</string>
-
+    <string name="device_id_input">请输入设备ID.</string>
+    <string name="user_name_input">请输入用户名.</string>
+    <string name="password_input">请输入密码.</string>
 </resources>

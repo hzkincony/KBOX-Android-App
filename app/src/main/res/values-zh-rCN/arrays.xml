@@ -7,8 +7,13 @@
         <item>16路继电器</item>
         <item>32路继电器</item>
         <item>8调光器</item>
+        <item>COLB</item>
     </string-array>
 
+    <string-array name="protocol">
+        <item>TCP</item>
+        <item>MQTT</item>
+    </string-array>
 
     <string-array name="mode">
         <item>点击</item>

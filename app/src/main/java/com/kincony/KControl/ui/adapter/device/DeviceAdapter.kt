@@ -10,16 +10,21 @@ import com.kincony.KControl.net.data.DeviceType
 import java.util.concurrent.Executors
 
 class DeviceAdapter : BaseMultiItemQuickAdapter<Device, BaseViewHolder>() {
-    var isSort = false
 
     companion object {
         internal var service = Executors.newScheduledThreadPool(1)
         internal var MAIN = Handler(Looper.getMainLooper())
     }
 
+    var isSort = false
+
+    val mContext: Context
+        get() = context
+
     val relayDeviceConvert: RelayDeviceConvert = RelayDeviceConvert(this)
     val dimmerDeviceConvert: DimmerDeviceConvert = DimmerDeviceConvert(this)
     val unknownDeviceConvert: UnknownDeviceConvert = UnknownDeviceConvert(this)
+    val clobDeviceConvert: CLOBDeviceConvert = CLOBDeviceConvert(this)
 
     init {
         addItemType(DeviceType.Unknown.value, unknownDeviceConvert.getLayoutId())
@@ -29,10 +34,8 @@ class DeviceAdapter : BaseMultiItemQuickAdapter<Device, BaseViewHolder>() {
         addItemType(DeviceType.Relay_16.value, relayDeviceConvert.getLayoutId())
         addItemType(DeviceType.Relay_32.value, relayDeviceConvert.getLayoutId())
         addItemType(DeviceType.Dimmer_8.value, dimmerDeviceConvert.getLayoutId())
+        addItemType(DeviceType.COLB.value, clobDeviceConvert.getLayoutId())
     }
-
-    val mContext: Context
-        get() = context
 
     override fun convert(baseViewHolder: BaseViewHolder, device: Device) {
         when (device.itemType) {
@@ -42,6 +45,7 @@ class DeviceAdapter : BaseMultiItemQuickAdapter<Device, BaseViewHolder>() {
             DeviceType.Relay_16.value,
             DeviceType.Relay_32.value -> relayDeviceConvert.convert(baseViewHolder, device)
             DeviceType.Dimmer_8.value -> dimmerDeviceConvert.convert(baseViewHolder, device)
+            DeviceType.COLB.value -> clobDeviceConvert.convert(baseViewHolder, device)
             else -> unknownDeviceConvert.convert(baseViewHolder, device)
         }
     }

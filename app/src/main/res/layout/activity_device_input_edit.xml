@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -110,14 +108,15 @@
                 android:textColor="@color/text333"
                 android:textSize="16dp" />
 
-
             <TextView
+                android:id="@+id/text1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="25dp"
                 android:text="@string/InPutName1"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/name1"
@@ -128,15 +127,18 @@
                 android:hint="@string/name"
                 android:paddingLeft="15dp"
                 android:textColor="@color/text333"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <TextView
+                android:id="@+id/text2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="25dp"
                 android:text="@string/InPutName2"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/name2"
@@ -147,15 +149,18 @@
                 android:hint="@string/name"
                 android:paddingLeft="15dp"
                 android:textColor="@color/text333"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <TextView
+                android:id="@+id/text3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="25dp"
                 android:text="@string/InPutName3"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/name3"
@@ -166,15 +171,18 @@
                 android:hint="@string/name"
                 android:paddingLeft="15dp"
                 android:textColor="@color/text333"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <TextView
+                android:id="@+id/text4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="25dp"
                 android:text="@string/InPutName4"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/name4"
@@ -185,15 +193,18 @@
                 android:hint="@string/name"
                 android:paddingLeft="15dp"
                 android:textColor="@color/text333"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <TextView
+                android:id="@+id/text5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="25dp"
                 android:text="@string/InPutName5"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/name5"
@@ -204,15 +215,18 @@
                 android:hint="@string/name"
                 android:paddingLeft="15dp"
                 android:textColor="@color/text333"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <TextView
+                android:id="@+id/text6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="25dp"
                 android:text="@string/InPutName6"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/name6"
@@ -223,7 +237,8 @@
                 android:hint="@string/name"
                 android:paddingLeft="15dp"
                 android:textColor="@color/text333"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/text7"
@@ -232,7 +247,8 @@
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="25dp"
                 android:text="@string/InPutName7"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/name7"
@@ -243,7 +259,8 @@
                 android:hint="@string/name"
                 android:paddingLeft="15dp"
                 android:textColor="@color/text333"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/text8"
@@ -252,7 +269,8 @@
                 android:layout_marginLeft="15dp"
                 android:layout_marginTop="25dp"
                 android:text="@string/InPutName8"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/name8"
@@ -263,11 +281,12 @@
                 android:hint="@string/name"
                 android:paddingLeft="15dp"
                 android:textColor="@color/text333"
-                android:textSize="16dp" />
+                android:textSize="16dp"
+                android:visibility="gone" />
 
             <View
                 android:layout_width="match_parent"
-                android:layout_height="50dp"/>
+                android:layout_height="50dp" />
         </LinearLayout>
 
     </ScrollView>

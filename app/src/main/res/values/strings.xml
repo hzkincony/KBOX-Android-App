@@ -77,5 +77,8 @@
 
     <string name="unknown_device">Unknown Device</string>
     <string name="data_exception_tips">Data exception, start data synchronization</string>
+    <string name="device_id_input">Please enter device id</string>
+    <string name="user_name_input">Please enter user name</string>
+    <string name="password_input">Please enter password</string>
 
 </resources>

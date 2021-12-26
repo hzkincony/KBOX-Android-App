@@ -39,37 +39,58 @@ class DeviceInPutEditActivity : BaseActivity() {
     }
 
     override fun initView() {
-        var iId = intent.getIntExtra("id", 0)
-        var sName = intent.getStringExtra("name")
+        val iId = intent.getIntExtra("id", 0)
+        val sName = intent.getStringExtra("name")
         iIcon = intent.getIntExtra("icon", R.drawable.icon6)
-        var sItemName = intent.getStringExtra("itemName")
+        val sItemName = intent.getStringExtra("itemName")
 
         ImageLoader.load(this, iIcon, icon)
         name.setText(sName)
 
-        var list: List<String> = sItemName.split(";")
+        val list: List<String> = sItemName.split(";")
 
-        name1.setText(list.get(0))
-        name2.setText(list.get(1))
-        name3.setText(list.get(2))
-        name4.setText(list.get(3))
-        name5.setText(list.get(4))
-        name6.setText(list.get(5))
-
-        when(list.size) {
-            6 -> {
-                text7.visibility = View.GONE
-                name7.visibility = View.GONE
-                text8.visibility = View.GONE
-                name8.visibility = View.GONE
-            }
-            8 -> {
-                text7.visibility = View.VISIBLE
-                name7.visibility = View.VISIBLE
-                text8.visibility = View.VISIBLE
-                name8.visibility = View.VISIBLE
-                name7.setText(list.get(6))
-                name8.setText(list.get(7))
+        for ((index, item) in list.withIndex()) {
+            when (index + 1) {
+                1 -> {
+                    text1.visibility = View.VISIBLE
+                    name1.visibility = View.VISIBLE
+                    name1.setText(item)
+                }
+                2 -> {
+                    text2.visibility = View.VISIBLE
+                    name2.visibility = View.VISIBLE
+                    name2.setText(item)
+                }
+                3 -> {
+                    text3.visibility = View.VISIBLE
+                    name3.visibility = View.VISIBLE
+                    name3.setText(item)
+                }
+                4 -> {
+                    text4.visibility = View.VISIBLE
+                    name4.visibility = View.VISIBLE
+                    name4.setText(item)
+                }
+                5 -> {
+                    text5.visibility = View.VISIBLE
+                    name5.visibility = View.VISIBLE
+                    name5.setText(item)
+                }
+                6 -> {
+                    text6.visibility = View.VISIBLE
+                    name6.visibility = View.VISIBLE
+                    name6.setText(item)
+                }
+                7 -> {
+                    text7.visibility = View.VISIBLE
+                    name7.visibility = View.VISIBLE
+                    name7.setText(item)
+                }
+                8 -> {
+                    text8.visibility = View.VISIBLE
+                    name8.visibility = View.VISIBLE
+                    name8.setText(item)
+                }
             }
         }
 
@@ -129,27 +150,18 @@ class DeviceInPutEditActivity : BaseActivity() {
 
     fun getItemName(num: Int): String {
         var itemName = ""
-        when(num) {
-            6 -> {
-                itemName += name1.text.toString() + ";"
-                itemName += name2.text.toString() + ";"
-                itemName += name3.text.toString() + ";"
-                itemName += name4.text.toString() + ";"
-                itemName += name5.text.toString() + ";"
-                itemName += name6.text.toString()
-            }
-            8 -> {
-                itemName += name1.text.toString() + ";"
-                itemName += name2.text.toString() + ";"
-                itemName += name3.text.toString() + ";"
-                itemName += name4.text.toString() + ";"
-                itemName += name5.text.toString() + ";"
-                itemName += name6.text.toString() + ";"
-                itemName += name7.text.toString() + ";"
-                itemName += name8.text.toString()
+        for (i in 1..num) {
+            when (i) {
+                1 -> itemName += name1.text.toString()
+                2 -> itemName += ";" + name2.text.toString()
+                3 -> itemName += ";" + name3.text.toString()
+                4 -> itemName += ";" + name4.text.toString()
+                5 -> itemName += ";" + name5.text.toString()
+                6 -> itemName += ";" + name6.text.toString()
+                7 -> itemName += ";" + name7.text.toString()
+                8 -> itemName += ";" + name8.text.toString()
             }
         }
-
         return itemName
     }
 
