@@ -82,4 +82,9 @@
     <string name="scan_qr_code_create_wrong">二维码创建失败</string>
     <string name="scan_qr_code_from_wrong">不支持的二维码</string>
     <string name="scan_qr_code_from_album_wrong">没有找到二维码</string>
+
+    <string name="ignoring_battery_optimizations">忽略电池优化</string>
+    <string name="ignoring_battery_optimizations_fail">忽略电池优化失败</string>
+    <string name="boot_start_management">后台启动管理</string>
+
 </resources>

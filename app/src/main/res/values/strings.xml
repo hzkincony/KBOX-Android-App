@@ -87,4 +87,8 @@
     <string name="scan_qr_code_from_wrong">不支持的二维码</string>
     <string name="scan_qr_code_from_album_wrong">没有找到二维码</string>
 
+    <string name="ignoring_battery_optimizations">Ignoring Battery Optimizations</string>
+    <string name="ignoring_battery_optimizations_fail">Ignoring Battery Optimizations Fail</string>
+    <string name="boot_start_management">Boot Start Management</string>
+
 </resources>
