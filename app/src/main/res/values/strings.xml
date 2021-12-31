@@ -81,4 +81,10 @@
     <string name="user_name_input">Please enter user name</string>
     <string name="password_input">Please enter password</string>
 
+    <string name="album">Album</string>
+    <string name="scan_qr_code_warn">放入框内，自动扫描</string>
+    <string name="scan_qr_code_create_wrong">二维码创建失败</string>
+    <string name="scan_qr_code_from_wrong">不支持的二维码</string>
+    <string name="scan_qr_code_from_album_wrong">没有找到二维码</string>
+
 </resources>

@@ -3,15 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingBottom="20dp"
     android:paddingLeft="15dp"
-    android:paddingRight="15dp">
+    android:paddingRight="15dp"
+    android:paddingBottom="20dp">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
         android:layout_marginTop="15dp"
+        android:layout_marginBottom="20dp"
         android:gravity="center"
         android:text="Add Device"
         android:textColor="@color/press"
@@ -46,7 +46,7 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:singleLine="true"
-            android:textSize="14dp"/>
+            android:textSize="14dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -170,20 +170,11 @@
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:hint="@string/device_id_input"
-            android:inputType="number"
             android:lines="1"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:textSize="14dp"/>
+            android:textSize="14dp" />
 
-        <ImageView
-            android:layout_marginLeft="5dp"
-            android:id="@+id/iv_scan_device_id"
-            android:layout_gravity="center_vertical"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@android:drawable/ic_menu_camera"
-            />
     </LinearLayout>
 
     <LinearLayout
@@ -212,12 +203,10 @@
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:hint="@string/user_name_input"
-            android:inputType="number"
             android:lines="1"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:textSize="14dp"
-            android:text="mqtt"/>
+            android:textSize="14dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -246,12 +235,11 @@
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:hint="@string/password_input"
-            android:inputType="number"
+            android:inputType="textPassword"
             android:lines="1"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:textSize="14dp"
-            android:text="123"/>
+            android:textSize="14dp" />
     </LinearLayout>
 
 </LinearLayout>

@@ -1,11 +1,17 @@
 package com.kincony.KControl.ui.fragment
 
+import android.Manifest
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
 import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatSpinner
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -34,6 +40,7 @@ import com.kincony.KControl.ui.adapter.device.DeviceAdapter
 import com.kincony.KControl.ui.adapter.device.DimmerDeviceConvert
 import com.kincony.KControl.ui.adapter.device.RelayDeviceConvert
 import com.kincony.KControl.ui.base.BaseFragment
+import com.kincony.KControl.ui.scan.ScanActivity
 import com.kincony.KControl.utils.KBoxStateRead
 import com.kincony.KControl.utils.ToastUtils
 import kotlinx.android.synthetic.main.fragment_home.*
@@ -202,6 +209,26 @@ class HomeFragment : BaseFragment() {
             showAddDeviceDialog()
         }
 
+        // 扫描
+        camera.setOnClickListener {
+            if (activity == null) return@setOnClickListener
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ContextCompat.checkSelfPermission(
+                        activity!!,
+                        Manifest.permission.CAMERA
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    val intent = Intent(activity!!, ScanActivity::class.java)
+                    startActivityForResult(intent, 2000)
+                } else {
+                    requestPermissions(arrayOf(Manifest.permission.CAMERA), 1000)
+                }
+            } else {
+                val intent = Intent(activity!!, ScanActivity::class.java)
+                startActivityForResult(intent, 2000)
+            }
+        }
+
         // 注册event事件
         EventBus.getDefault().register(this)
 
@@ -209,6 +236,56 @@ class HomeFragment : BaseFragment() {
         loadDevice()
         // 加载
         loadScene()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == 2000 && resultCode == Activity.RESULT_OK) {
+            val scanResult = data?.getStringExtra("scan_result")
+            scanResult?.let {
+                val json = JSONObject(it)
+                if (json.optString("ip") == "") {
+                    ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
+                    return
+                }
+                if (json.optString("port") == "") {
+                    ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
+                    return
+                }
+                if (json.optString("deviceType") == "") {
+                    ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
+                    return
+                }
+                if (json.optString("protocolType") == "") {
+                    ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
+                    return
+                }
+                if (ProtocolType.MQTT.value == json.optInt("protocolType")) {
+                    if (json.optString("userName") == "") {
+                        ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
+                        return
+                    }
+                    if (json.optString("password") == "") {
+                        ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
+                        return
+                    }
+                    if (json.optString("deviceId") == "") {
+                        ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
+                        return
+                    }
+                }
+                val ipAddress = IPAddress(
+                    json.optString("ip"),
+                    Integer.decode(json.optString("port")),
+                    json.optInt("deviceType"),
+                    json.optInt("protocolType"),
+                    json.optString("userName"),
+                    json.optString("password"),
+                    json.optString("deviceId")
+                )
+                addDevice(ipAddress)
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     @Subscribe

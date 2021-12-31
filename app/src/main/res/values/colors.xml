@@ -23,4 +23,11 @@
     <color name="text333">#333333</color>
     <color name="text666">#666666</color>
     <color name="text999">#999999</color>
+
+    <color name="scan_mask">#60000000</color>
+    <color name="scan_dot">#ff6600</color>
+    <color name="scan_laser">#ffffff</color>
+    <color name="scan_result_view">#b0000000</color>
+    <color name="scan_result_dots">#c099cc00</color>
+
 </resources>

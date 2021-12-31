@@ -1,5 +1,6 @@
 package com.kincony.KControl.ui.adapter
 
+import android.widget.ImageView
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.kincony.KControl.R
@@ -15,5 +16,16 @@ class AddressAdapter : BaseQuickAdapter<IPAddress, BaseViewHolder> {
     override fun convert(helper: BaseViewHolder, item: IPAddress) {
         helper.setText(R.id.ip, "IP:${item.ip}")
         helper.setText(R.id.port, "Port:${item.port}")
+        helper.getView<ImageView>(R.id.iv_qr_code).setOnClickListener {
+            qrCodeClickCallback?.onQrCodeClick(item)
+        }
     }
+
+    var qrCodeClickCallback: QrCodeClickCallback? = null
+
+    interface QrCodeClickCallback {
+        fun onQrCodeClick(item: IPAddress)
+    }
+
+
 }
