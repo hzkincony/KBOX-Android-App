@@ -2,6 +2,7 @@ package com.kincony.KControl.net.mqtt
 
 import com.kincony.KControl.net.mqtt.callback.MqttConnectCallback
 import com.kincony.KControl.net.mqtt.callback.MqttSubscribeCallback
+import com.kincony.KControl.net.mqtt.event.MqttPublishEvent
 import com.kincony.KControl.net.mqtt.event.MqttSubscribeEvent
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.*
@@ -10,7 +11,6 @@ import io.netty.channel.socket.SocketChannel
 import io.netty.channel.socket.nio.NioSocketChannel
 import io.netty.handler.codec.mqtt.MqttDecoder
 import io.netty.handler.codec.mqtt.MqttEncoder
-import io.netty.handler.timeout.IdleStateHandler
 
 
 class MqttClient(
@@ -42,38 +42,36 @@ class MqttClient(
 
     var state = INIT
     val subscribeEventList: ArrayList<MqttSubscribeEvent> = ArrayList()
-//    val publishEventList: ArrayList<MqttPublishEvent> = ArrayList()
+    val publishEventList: ArrayList<MqttPublishEvent> = ArrayList()
+    var reconnectCallback: MqttConnectCallback? = null
 
     fun connect(connectCallback: MqttConnectCallback) {
         if (state != CONNECTING && state != CONNECTED) {
             state = CONNECTING
-
+            reconnectCallback = connectCallback
             val workerGroup: EventLoopGroup = NioEventLoopGroup()
             val bootstrap = Bootstrap()
             bootstrap.group(workerGroup)
             bootstrap.channel(NioSocketChannel::class.java)
+            bootstrap.option(ChannelOption.SO_KEEPALIVE, true)
             bootstrap.handler(object : ChannelInitializer<SocketChannel>() {
                 @Throws(Exception::class)
                 override fun initChannel(ch: SocketChannel) {
                     ch.pipeline().addLast(MqttEncoder.INSTANCE)
                     ch.pipeline().addLast(MqttDecoder())
-                    ch.pipeline().addLast(IdleStateHandler(60, 60, 0))
-                    ch.pipeline().addLast(MqttPingHandler(this@MqttClient, 30))
+//                    ch.pipeline().addLast(IdleStateHandler(60, 60, 0))
+//                    ch.pipeline().addLast(MqttPingHandler(this@MqttClient, 30))
                     ch.pipeline()
                         .addLast(MqttChannelHandler(this@MqttClient, object : MqttConnectCallback {
 
                             override fun onSuccess(client: MqttClient) {
                                 state = CONNECTED
-//                                publishEventList.forEach {
-//                                    publish(it.topic, it.message)
-//                                }
-//                                publishEventList.clear()
-                                connectCallback.onSuccess(this@MqttClient)
+                                reconnectCallback?.onSuccess(this@MqttClient)
                             }
 
                             override fun onFail(msg: String) {
                                 state = CONNECTED_FAIL
-                                connectCallback.onFail(msg)
+                                reconnectCallback?.onFail(msg)
                             }
                         }))
                 }
@@ -84,7 +82,7 @@ class MqttClient(
                         channel = future.channel()
                     } else {
                         state = CONNECTED_FAIL
-                        connectCallback.onFail("Connect Fail!")
+                        reconnectCallback?.onFail("Connect Fail!")
                     }
                 }
             })
@@ -95,10 +93,9 @@ class MqttClient(
         if (state == CONNECTED) {
             val publishMessage = MqttMessageHelper.publishMessage(topic, message, getMessageId())
             channel?.writeAndFlush(publishMessage)
+        } else {
+            publishEventList.add(MqttPublishEvent(topic, message))
         }
-//        else {
-//            publishEventList.add(MqttPublishEvent(topic, message))
-//        }
     }
 
     fun subscribe(topic: String, callback: MqttSubscribeCallback?) {

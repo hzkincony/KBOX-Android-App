@@ -79,6 +79,7 @@ class MqttChannelHandler(
         LogUtils.d("MQTT[${client.clientId}] channelUnregistered")
         super.channelUnregistered(ctx)
         client.disconnect()
+        client.connect(client.reconnectCallback!!)
     }
 
     override fun channelRegistered(ctx: ChannelHandlerContext?) {
@@ -95,6 +96,7 @@ class MqttChannelHandler(
         LogUtils.d("MQTT[${client.clientId}] exceptionCaught ${cause}")
         super.exceptionCaught(ctx, cause)
         client.disconnect()
+        client.connect(client.reconnectCallback!!)
     }
 
     private fun handlePublish(channel: Channel, message: MqttPublishMessage) {
