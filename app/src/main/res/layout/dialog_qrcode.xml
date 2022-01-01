@@ -5,8 +5,8 @@
 
     <ImageView
         android:id="@+id/qr_code"
-        android:layout_width="240dp"
-        android:layout_height="240dp"
+        android:layout_width="320dp"
+        android:layout_height="320dp"
         android:layout_gravity="center">
 
     </ImageView>

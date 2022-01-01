@@ -1,7 +1,9 @@
 package com.kincony.KControl.net.data
 
+import android.content.Context
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.kincony.KControl.utils.Tools
 
 @Entity(tableName = "address")
 class IPAddress {
@@ -22,21 +24,20 @@ class IPAddress {
 
     var deviceId: String? = null
 
-    fun getDeviceTypeEnum(): DeviceType {
-        return when (deviceType) {
-            DeviceType.Relay_2.value -> DeviceType.Relay_2
-            DeviceType.Relay_4.value -> DeviceType.Relay_4
-            DeviceType.Relay_8.value -> DeviceType.Relay_8
-            DeviceType.Relay_16.value -> DeviceType.Relay_16
-            DeviceType.Relay_32.value -> DeviceType.Relay_32
-            DeviceType.Dimmer_8.value -> DeviceType.Dimmer_8
-            DeviceType.COLB.value -> DeviceType.COLB
-            else -> DeviceType.Unknown
-        }
-    }
 
     fun getDeviceTypeNumberCount(): Int {
-        return getDeviceTypeEnum().numberCount
+        return Tools.getDeviceTypeEnum(deviceType).numberCount
+    }
+
+    fun getDeviceTypeName(context: Context): String {
+        if (context.resources.configuration.locale.country.contains("CN"))
+            return Tools.getDeviceTypeEnum(deviceType).typeNameCN
+        else
+            return Tools.getDeviceTypeEnum(deviceType).typeName
+    }
+
+    fun getProtocolTypeName(): String {
+        return Tools.getProtocolTypeEnum(protocolType).protocolTypeName
     }
 
     constructor(
@@ -60,9 +61,9 @@ class IPAddress {
     override fun equals(other: Any?): Boolean {
         return if (other is IPAddress && protocolType == other.protocolType) {
             if (protocolType == ProtocolType.MQTT.value) {
-                username != null && password != null && password != null && other.ip == ip && other.port == port && other.username == username && other.password == password && other.deviceId == deviceId
+                other.ip == ip && other.port == port && other.deviceType == deviceType && other.protocolType == protocolType && username != null && password != null && password != null && other.username == username && other.password == password && other.deviceId == deviceId
             } else {
-                other.ip == ip && other.port == port
+                other.ip == ip && other.port == port && other.deviceType == deviceType && other.protocolType == protocolType
             }
         } else {
             false
@@ -90,9 +91,9 @@ class IPAddress {
 
     override fun toString(): String {
         return if (protocolType == ProtocolType.MQTT.value) {
-            "mqtt:${ip}:${port}:${deviceId}"
+            "mqtt:${ip}:${port}:${deviceId}:${deviceType}"
         } else {
-            "tcp:${ip}:${port}"
+            "tcp:${ip}:${port}:${deviceType}"
         }
     }
 

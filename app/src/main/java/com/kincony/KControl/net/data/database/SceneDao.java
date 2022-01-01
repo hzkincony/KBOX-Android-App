@@ -16,16 +16,9 @@ public interface SceneDao {
     @Query("SELECT * FROM scene")
     List<Scene> getAllScene();
 
-
-    @Query("SELECT * FROM scene WHERE id == :id")
-    Scene getScene(int id);
-
     /*当数据库中已经有此用户的时候，直接替换*/
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertScene(Scene... scene);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    public void insertScene(List<Scene> scenes);
+    public long insertScene(Scene scene);
 
     @Update
     public void updateScene(Scene scene);

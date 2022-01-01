@@ -343,9 +343,7 @@ class ScanActivity : BaseActivity(), SurfaceHolder.Callback {
         val result = Intent()
         result.putExtra("scan_result", scanResult.text)
         setResult(RESULT_OK, result)
-
-        // delayed finish
-        Handler().post { finish() }
+        finish()
     }
 
 

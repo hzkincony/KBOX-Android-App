@@ -4,6 +4,7 @@ import com.kincony.KControl.net.mqtt.callback.MqttConnectCallback
 import com.kincony.KControl.net.mqtt.callback.MqttSubscribeCallback
 import com.kincony.KControl.net.mqtt.event.MqttPublishEvent
 import com.kincony.KControl.net.mqtt.event.MqttSubscribeEvent
+import com.kincony.KControl.utils.LogUtils
 import io.netty.bootstrap.Bootstrap
 import io.netty.channel.*
 import io.netty.channel.nio.NioEventLoopGroup
@@ -44,6 +45,7 @@ class MqttClient(
     val subscribeEventList: ArrayList<MqttSubscribeEvent> = ArrayList()
     val publishEventList: ArrayList<MqttPublishEvent> = ArrayList()
     var reconnectCallback: MqttConnectCallback? = null
+    var isSubACK: Boolean = false
 
     fun connect(connectCallback: MqttConnectCallback) {
         if (state != CONNECTING && state != CONNECTED) {
@@ -89,9 +91,22 @@ class MqttClient(
         }
     }
 
+    fun publishFlush() {
+        val iterator = publishEventList.iterator()
+        while (iterator.hasNext()) {
+            val next = iterator.next()
+            val publishMessage =
+                MqttMessageHelper.publishMessage(next.topic, next.message, getMessageId())
+            LogUtils.d("MQTT[${clientId}] SEND_PUB ${next.topic} ${next.message}")
+            channel?.writeAndFlush(publishMessage)
+            iterator.remove()
+        }
+    }
+
     fun publish(topic: String, message: String) {
-        if (state == CONNECTED) {
+        if (state == CONNECTED && isSubACK) {
             val publishMessage = MqttMessageHelper.publishMessage(topic, message, getMessageId())
+            LogUtils.d("MQTT[${clientId}] SEND_PUB ${topic} ${message}")
             channel?.writeAndFlush(publishMessage)
         } else {
             publishEventList.add(MqttPublishEvent(topic, message))
@@ -109,6 +124,7 @@ class MqttClient(
         subscribeEventList.add(MqttSubscribeEvent(topic, callback))
         if (state == CONNECTED) {
             val subscribeMessage = MqttMessageHelper.subscribeMessage(topic, getMessageId())
+            LogUtils.d("MQTT[${clientId}] SEND_SUB ${topic} ")
             channel?.writeAndFlush(subscribeMessage)
         }
     }

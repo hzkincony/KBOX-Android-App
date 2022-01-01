@@ -9,9 +9,9 @@ import com.kincony.KControl.net.data.ProtocolType
 /**
  * 地址适配器
  */
-class AddressAdapter : BaseQuickAdapter<IPAddress, BaseViewHolder> {
+class HistoryAdapter : BaseQuickAdapter<IPAddress, BaseViewHolder> {
 
-    constructor() : super(R.layout.item_address)
+    constructor() : super(R.layout.item_history)
 
     override fun convert(helper: BaseViewHolder, item: IPAddress) {
         helper.setText(
@@ -27,18 +27,12 @@ class AddressAdapter : BaseQuickAdapter<IPAddress, BaseViewHolder> {
             "${helper.itemView.context.getString(R.string.label_protocol)}:${item.getProtocolTypeName()}"
         )
         if (ProtocolType.MQTT.value == item.protocolType) {
-            helper.setVisible(R.id.deviceId, true)
             helper.setVisible(R.id.userName, true)
-            helper.setText(
-                R.id.deviceId,
-                "${helper.itemView.context.getString(R.string.label_device_id)}:${item.deviceId}"
-            )
             helper.setText(
                 R.id.userName,
                 "${helper.itemView.context.getString(R.string.label_user_name)}:${item.username}"
             )
         } else {
-            helper.setGone(R.id.deviceId, true)
             helper.setGone(R.id.userName, true)
         }
     }

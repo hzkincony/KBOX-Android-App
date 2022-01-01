@@ -104,5 +104,8 @@ dependencies {
     //zxing
     implementation 'com.google.zxing:core:3.3.3'
 
+    //gson
+    implementation 'com.google.code.gson:gson:2.8.4'
+
     testImplementation 'junit:junit:4.12'
 }

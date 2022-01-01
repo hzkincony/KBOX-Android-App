@@ -29,6 +29,8 @@ class MqttChannelHandler(
                 handleConnAck(ctx.channel(), msg as MqttConnAckMessage)
             }
             MqttMessageType.SUBACK -> {
+                client.isSubACK = true
+                client.publishFlush()
                 LogUtils.d("MQTT[${client.clientId}] SUBACK ${msg}")
             }
             MqttMessageType.UNSUBACK -> {

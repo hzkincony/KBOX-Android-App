@@ -16,13 +16,14 @@ import com.kincony.KControl.R
 import com.kincony.KControl.net.data.IPAddress
 import com.kincony.KControl.net.data.RefreshAddressEvent
 import com.kincony.KControl.net.data.RefreshSceneEvent
+import com.kincony.KControl.net.data.ShareQRCode
 import com.kincony.KControl.net.data.database.KBoxDatabase
 import com.kincony.KControl.ui.adapter.AddressAdapter
 import com.kincony.KControl.ui.base.BaseActivity
 import com.kincony.KControl.utils.ToastUtils
+import com.kincony.KControl.utils.Tools
 import kotlinx.android.synthetic.main.activity_address.*
 import org.greenrobot.eventbus.EventBus
-import org.json.JSONObject
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -45,49 +46,48 @@ class AddressActivity : BaseActivity() {
         back.setOnClickListener {
             finish()
         }
+
+        iv_qr_code.setOnClickListener {
+            val allAddress = KBoxDatabase.getInstance(this).addressDao.allAddress
+            val allDevice = KBoxDatabase.getInstance(this).deviceDao.allDevice
+            val allScene = KBoxDatabase.getInstance(this).sceneDao.allScene
+            val shareQRCode = ShareQRCode()
+            shareQRCode.allAddress = allAddress
+            shareQRCode.allScene = allScene
+            shareQRCode.allDevice = allDevice
+            val content = Tools.zip(Tools.gson.toJson(shareQRCode))
+            val bitmap =
+                createQRCodeBitmap(
+                    content,
+                    480,
+                    480,
+                    "UTF-8",
+                    "L",
+                    "1",
+                    Color.BLACK,
+                    Color.WHITE
+                )
+            if (bitmap != null) {
+                val view =
+                    LayoutInflater.from(this@AddressActivity).inflate(R.layout.dialog_qrcode, null)
+                view.findViewById<ImageView>(R.id.qr_code).setImageBitmap(bitmap)
+                AlertDialog.Builder(this@AddressActivity)
+                    .setCancelable(true)
+                    .setView(view)
+                    .setPositiveButton(resources.getString(R.string.confirm), null)
+                    .create()
+                    .show()
+            } else {
+                ToastUtils.showToastLong(getString(R.string.scan_qr_code_create_wrong))
+            }
+        }
+
         recycler.adapter = adapter
         recycler.layoutManager = LinearLayoutManager(this)
 
         var address = KBoxDatabase.getInstance(this).addressDao.allAddress
         list.addAll(address)
         adapter.setNewInstance(list)
-        adapter.qrCodeClickCallback = object : AddressAdapter.QrCodeClickCallback {
-            override fun onQrCodeClick(item: IPAddress) {
-                val jsonObject = JSONObject()
-                jsonObject.put("ip", item.ip)
-                jsonObject.put("port", item.port)
-                jsonObject.put("deviceType", item.deviceType)
-                jsonObject.put("protocolType", item.protocolType)
-                jsonObject.put("userName", item.username)
-                jsonObject.put("password", item.password)
-                jsonObject.put("deviceId", item.deviceId)
-                val bitmap =
-                    createQRCodeBitmap(
-                        jsonObject.toString(),
-                        240,
-                        240,
-                        "UTF-8",
-                        "H",
-                        "1",
-                        Color.BLACK,
-                        Color.WHITE
-                    )
-                if (bitmap != null) {
-                    val view =
-                        LayoutInflater.from(this@AddressActivity)
-                            .inflate(R.layout.dialog_qrcode, null)
-                    view.findViewById<ImageView>(R.id.qr_code).setImageBitmap(bitmap)
-                    AlertDialog.Builder(this@AddressActivity)
-                        .setCancelable(true)
-                        .setView(view)
-                        .setPositiveButton(resources.getString(R.string.confirm), null)
-                        .create()
-                        .show()
-                } else {
-                    ToastUtils.showToastLong(getString(R.string.scan_qr_code_create_wrong))
-                }
-            }
-        }
         adapter.setOnItemLongClickListener { adapter, view, position ->
             var address = list[position]
             getLoadingDialog(this@AddressActivity, address)?.show()
@@ -97,7 +97,7 @@ class AddressActivity : BaseActivity() {
 
     private fun deleteAddress(address: IPAddress) {
         KBoxDatabase.getInstance(this).addressDao.delete(address)
-        var scenes = KBoxDatabase.getInstance(this).sceneDao.allScene
+        val scenes = KBoxDatabase.getInstance(this).sceneDao.allScene
         for (s in scenes) {
             if (s.address.contains(address.toString())) {
                 KBoxDatabase.getInstance(this).sceneDao.deleteScene(s)

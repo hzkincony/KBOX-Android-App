@@ -480,12 +480,12 @@ class SceneEditActivity : BaseActivity() {
         if (scene?.ids.isNullOrEmpty()) {
             scene?.ids = "${address.id}"
             scene?.address = address.toString()
-            scene?.length = "${address.deviceType % 10000}"
+            scene?.length = "${address.getDeviceTypeNumberCount()}"
             scene?.action = getDefaultAction(address)
         } else {
             scene?.ids = "${scene?.ids}_${address.id}"
             scene?.address = "${scene?.address}_${address}"
-            scene?.length = "${scene?.length}_${address.deviceType % 10000}"
+            scene?.length = "${scene?.length}_${address.getDeviceTypeNumberCount()}"
             scene?.action = "${scene?.action}_${getDefaultAction(address)}"
         }
         adapter?.notifyDataSetChanged()

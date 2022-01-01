@@ -90,5 +90,14 @@
     <string name="ignoring_battery_optimizations">Ignoring Battery Optimizations</string>
     <string name="ignoring_battery_optimizations_fail">Ignoring Battery Optimizations Fail</string>
     <string name="boot_start_management">Boot Start Management</string>
+    <string name="history">History</string>
+    <string name="label_address">Address:</string>
+    <string name="label_ip">IP:</string>
+    <string name="label_port">PORT:</string>
+    <string name="label_model">Model:</string>
+    <string name="label_protocol">Protocol:</string>
+    <string name="label_device_id">Device ID:</string>
+    <string name="label_user_name">User Name:</string>
+    <string name="label_password">Password:</string>
 
 </resources>

@@ -5,12 +5,8 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.AdapterView
-import android.widget.EditText
+import android.text.TextUtils
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -32,6 +28,7 @@ import com.kincony.KControl.net.mqtt.callback.MqttSubscribeCallback
 import com.kincony.KControl.net.usecase.KDimmerReadAllDimmerUseCase
 import com.kincony.KControl.net.usecase.KDimmerSetAllDimmerUseCase
 import com.kincony.KControl.net.usecase.KDimmerSetOneDimmerUseCase
+import com.kincony.KControl.ui.AddDeviceActivity
 import com.kincony.KControl.ui.DeviceEditActivity
 import com.kincony.KControl.ui.DeviceInPutEditActivity
 import com.kincony.KControl.ui.adapter.HomeSceneAdapter
@@ -43,6 +40,7 @@ import com.kincony.KControl.ui.base.BaseFragment
 import com.kincony.KControl.ui.scan.ScanActivity
 import com.kincony.KControl.utils.KBoxStateRead
 import com.kincony.KControl.utils.ToastUtils
+import com.kincony.KControl.utils.Tools
 import kotlinx.android.synthetic.main.fragment_home.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
@@ -51,10 +49,10 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class HomeFragment : BaseFragment() {
-    private var deviceList = ArrayList<Device>()
+    private var deviceList: ArrayList<Device>? = null
     private var adapter: DeviceAdapter? = null
 
-    private var sceneList = ArrayList<Scene>()
+    private var sceneList: ArrayList<Scene>? = null
     private var sceneAdapter: HomeSceneAdapter? = null
     private var isSortMode = false
 
@@ -63,6 +61,8 @@ class HomeFragment : BaseFragment() {
     override fun getLayoutId() = R.layout.fragment_home
 
     override fun initView() {
+        deviceList = ArrayList()
+        sceneList = ArrayList()
         // 下拉刷新
         refresh.setOnRefreshListener {
             getAllDeviceState(true)
@@ -72,7 +72,7 @@ class HomeFragment : BaseFragment() {
         adapter = DeviceAdapter()
         recycler.layoutManager = LinearLayoutManager(context)
         recycler.adapter = adapter
-        adapter?.setNewInstance(deviceList)
+        adapter?.setNewInstance(deviceList!!)
         // 继电器点击事件
         adapter?.relayDeviceConvert?.callback = object : RelayDeviceConvert.Callback {
             override fun onSceneActionDown(position: Int, device: Device) {
@@ -162,9 +162,9 @@ class HomeFragment : BaseFragment() {
         sceneAdapter = HomeSceneAdapter()
         scene.layoutManager = GridLayoutManager(context, 4)
         scene.adapter = sceneAdapter
-        sceneAdapter?.setNewInstance(sceneList)
+        sceneAdapter?.setNewInstance(sceneList!!)
         sceneAdapter?.setOnItemClickListener { adapter, view, position ->
-            val scene = sceneList[position]
+            val scene = sceneList!![position]
             if (!scene.isTouch) {
                 onScene(scene)
             }
@@ -188,7 +188,7 @@ class HomeFragment : BaseFragment() {
             }
         }
         // 情景模式拖拽事件
-        val itemTouchHelper = ItemTouchHelper(HelperCallback(adapter, deviceList))
+        val itemTouchHelper = ItemTouchHelper(HelperCallback(adapter, deviceList!!))
         sortButton.setOnClickListener {
             isSortMode = !isSortMode
             adapter?.isSort = isSortMode
@@ -241,38 +241,107 @@ class HomeFragment : BaseFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == 2000 && resultCode == Activity.RESULT_OK) {
             val scanResult = data?.getStringExtra("scan_result")
-            scanResult?.let {
-                val json = JSONObject(it)
-                if (json.optString("ip") == "") {
-                    ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
-                    return
+            if (TextUtils.isEmpty(scanResult)) return
+            val unzip = Tools.unzip(scanResult!!)
+            if (!unzip.startsWith("{") || !unzip.endsWith("}")) {
+                ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
+                return
+            }
+            val shareQRCode = Tools.gson.fromJson<ShareQRCode>(unzip, ShareQRCode::class.java)
+            if (shareQRCode.allAddress == null || shareQRCode.allAddress.size == 0) {
+                ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
+                return
+            }
+
+            val newAddressIDMap = HashMap<Int, Int>()
+            val existsAddressList = ArrayList<IPAddress>()
+
+            shareQRCode.allAddress!!.forEach {
+                val temp = if (it.protocolType == ProtocolType.MQTT.value) {
+                    KBoxDatabase.getInstance(context).addressDao.getMQTTAddress(
+                        it.ip,
+                        it.port,
+                        it.deviceType,
+                        it.username,
+                        it.password,
+                        it.deviceId
+                    )
+                } else {
+                    KBoxDatabase.getInstance(context).addressDao.getTCPAddress(
+                        it.ip,
+                        it.port,
+                        it.deviceType
+                    )
                 }
-                if (json.optString("port") == "") {
-                    ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
-                    return
+                if (temp == null) {
+                    val oldId = it.id;
+                    it.id = 0
+                    val newId = KBoxDatabase.getInstance(activity).addressDao.insertAddress(it)
+                    it.id = newId.toInt()
+                    newAddressIDMap.put(oldId, it.id)
+                } else {
+                    existsAddressList.add(temp)
                 }
-                if (json.optString("deviceType") == "") {
-                    ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
-                    return
+            }
+
+            val lastDevice = KBoxDatabase.getInstance(context).deviceDao.lastDevice
+            var deviceCount =
+                if (lastDevice != null && lastDevice.size == 1) lastDevice[0].index + 1 else 1
+            shareQRCode.allDevice?.forEach {
+                if (newAddressIDMap.get(it.addressId) != null) {
+                    it.index = deviceCount
+                    it.addressId = newAddressIDMap.get(it.addressId)!!.toInt()
+                    KBoxDatabase.getInstance(activity).deviceDao.insertDevice(it)
+                    deviceCount++
                 }
-                if (json.optString("protocolType") == "") {
-                    ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
-                    return
-                }
-                if (ProtocolType.MQTT.value == json.optInt("protocolType")) {
-                    if (json.optString("userName") == "") {
-                        ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
-                        return
+            }
+
+            shareQRCode.allScene?.forEach {
+                val ids = it.ids.split("_")
+                var isAdd = true
+                for ((index, item) in ids.withIndex()) {
+                    if (newAddressIDMap.get(item.toInt()) == null) {
+                        isAdd = false
+                        break
                     }
-                    if (json.optString("password") == "") {
-                        ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
-                        return
-                    }
-                    if (json.optString("deviceId") == "") {
-                        ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
-                        return
+                    if (index == 0) {
+                        it.ids = "${newAddressIDMap.get(item.toInt())!!.toInt()}"
+                    } else {
+                        it.ids += "_${newAddressIDMap.get(item.toInt())!!.toInt()}"
                     }
                 }
+                if (isAdd) {
+                    it.id = 0
+                    KBoxDatabase.getInstance(activity).sceneDao.insertScene(it)
+                }
+            }
+
+            // 加载设备数据
+            loadDevice()
+            // 加载
+            loadScene()
+
+            if (existsAddressList.size > 0) {
+                var message = ""
+                for (ipAddress in existsAddressList) {
+                    if (ProtocolType.MQTT.value == ipAddress.protocolType) {
+                        message += "${ipAddress.getDeviceTypeName(activity!!)}:\n${ipAddress.deviceId}\n"
+                    } else {
+                        message += "${ipAddress.getDeviceTypeName(activity!!)}:\n${ipAddress.ip}:${ipAddress.port}\n"
+                    }
+                }
+                AlertDialog.Builder(activity!!)
+                    .setTitle(resources.getString(R.string.add_already))
+                    .setMessage(message)
+                    .setPositiveButton(resources.getString(R.string.confirm), null)
+                    .create()
+                    .show()
+            }
+        } else
+            if (requestCode == 2001 && resultCode == Activity.RESULT_OK) {
+                val deviceResult = data?.getStringExtra("device_result")
+                if (TextUtils.isEmpty(deviceResult)) return
+                val json = JSONObject(deviceResult!!)
                 val ipAddress = IPAddress(
                     json.optString("ip"),
                     Integer.decode(json.optString("port")),
@@ -284,7 +353,6 @@ class HomeFragment : BaseFragment() {
                 )
                 addDevice(ipAddress)
             }
-        }
         super.onActivityResult(requestCode, resultCode, data)
     }
 
@@ -303,7 +371,7 @@ class HomeFragment : BaseFragment() {
     @Subscribe
     public fun setDeviceName(event: DeviceChange) {
         var d: Device? = null
-        for (i in deviceList) {
+        for (i in deviceList!!) {
             if (i.deviceId == event.id) {
                 d = i;
             }
@@ -321,7 +389,7 @@ class HomeFragment : BaseFragment() {
     @Subscribe
     public fun setDeviceInPutName(event: DeviceInPutChange) {
         var d: Device? = null
-        for (i in deviceList) {
+        for (i in deviceList!!) {
             if (i.deviceId == event.id) {
                 d = i;
             }
@@ -342,13 +410,13 @@ class HomeFragment : BaseFragment() {
             refresh.isRefreshing = false
         }
         if (event.ipAddress != null) {
-            for ((index, device) in deviceList.withIndex()) {
+            for ((index, device) in deviceList!!.withIndex()) {
                 if (device.address.ip == event.ipAddress!!.ip) {
                     adapter?.notifyItemChanged(index)
                 }
             }
         } else {
-            adapter?.notifyItemRangeChanged(0, deviceList.size)
+            adapter?.notifyItemRangeChanged(0, deviceList!!.size)
         }
     }
 
@@ -366,8 +434,8 @@ class HomeFragment : BaseFragment() {
      * 从数据库读取情景模式
      */
     private fun loadScene() {
-        sceneList.clear()
-        sceneList.addAll(KBoxDatabase.getInstance(context).sceneDao.allScene)
+        sceneList!!.clear()
+        sceneList!!.addAll(KBoxDatabase.getInstance(context).sceneDao.allScene)
         sceneAdapter?.notifyDataSetChanged()
     }
 
@@ -375,7 +443,7 @@ class HomeFragment : BaseFragment() {
      * 从数据库读取设备
      */
     private fun loadDevice() {
-        deviceList.clear()
+        deviceList!!.clear()
         adapter?.notifyDataSetChanged()
 
         val devices = KBoxDatabase.getInstance(context).deviceDao.allDevice
@@ -388,7 +456,7 @@ class HomeFragment : BaseFragment() {
             }
         }
 
-        deviceList.addAll(devices)
+        deviceList!!.addAll(devices)
         adapter?.notifyDataSetChanged()
         getAllDeviceState(true)
     }
@@ -409,9 +477,23 @@ class HomeFragment : BaseFragment() {
         }
 
         KBoxDatabase.getInstance(context).addressDao.insertAddress(address)
-        val temp = KBoxDatabase.getInstance(context).addressDao.getAddress(address.ip, address.port)
-
-        val size = deviceList.size
+        val temp = if (address.protocolType == ProtocolType.MQTT.value) {
+            KBoxDatabase.getInstance(context).addressDao.getMQTTAddress(
+                address.ip,
+                address.port,
+                address.deviceType,
+                address.username,
+                address.password,
+                address.deviceId
+            )
+        } else {
+            KBoxDatabase.getInstance(context).addressDao.getTCPAddress(
+                address.ip,
+                address.port,
+                address.deviceType
+            )
+        }
+        val size = deviceList!!.size
         var index = 0
         val list = ArrayList<Device>()
 
@@ -493,7 +575,9 @@ class HomeFragment : BaseFragment() {
             }
         }
 
-        KBoxDatabase.getInstance(context).deviceDao.insertDevice(list)
+        list.forEach {
+            KBoxDatabase.getInstance(context).deviceDao.insertDevice(it)
+        }
 
         val readList = KBoxDatabase.getInstance(context).deviceDao.allDevice
         val addressList = KBoxDatabase.getInstance(context).addressDao.allAddress
@@ -505,8 +589,8 @@ class HomeFragment : BaseFragment() {
             }
         }
 
-        deviceList.clear()
-        deviceList.addAll(readList)
+        deviceList!!.clear()
+        deviceList!!.addAll(readList)
         adapter?.notifyDataSetChanged()
 
         getAllDeviceState(true)
@@ -536,10 +620,10 @@ class HomeFragment : BaseFragment() {
 
     private fun changeDate() {
         var index = 0
-        for (i in deviceList) {
+        for (i in deviceList!!) {
             i.index = index++
         }
-        KBoxDatabase.getInstance(context).deviceDao.updateDevice(deviceList)
+        KBoxDatabase.getInstance(context).deviceDao.updateDevice(deviceList!!)
     }
 
     private fun onScene(scene: Scene) {
@@ -551,7 +635,7 @@ class HomeFragment : BaseFragment() {
         val dList = ArrayList<ArrayList<Device>>()
         for (item in sceneAddress) {
             val dsTemp = ArrayList<Device>()
-            for (ds in deviceList) {
+            for (ds in deviceList!!) {
                 if (item == ds.address.toString()) {
                     dsTemp.add(ds)
                 }
@@ -643,7 +727,7 @@ class HomeFragment : BaseFragment() {
 
         for ((index, item) in sceneAddress.withIndex()) {
             var address: IPAddress? = null
-            for (d in deviceList) {
+            for (d in deviceList!!) {
                 if (item == d.address.toString()) {
                     address = d.address
                     break
@@ -841,7 +925,7 @@ class HomeFragment : BaseFragment() {
 
                 override fun onResponse(response: ResponseBody?) {
                     if (response is KBoxState) {
-                        KBoxStateRead.readAllState(response, address, deviceList)
+                        KBoxStateRead.readAllState(response, address, deviceList!!)
                     }
                     EventBus.getDefault().post(UpdateDeviceUI())
                 }
@@ -941,7 +1025,7 @@ class HomeFragment : BaseFragment() {
                 override fun onResponse(response: ResponseBody?) {
                     onFinish?.invoke()
                     if (response is KBoxState && response.succeed) {
-                        KBoxStateRead.readAllState(response, address, deviceList)
+                        KBoxStateRead.readAllState(response, address, deviceList!!)
                         EventBus.getDefault().post(UpdateDeviceUI())
                     }
                 }
@@ -955,7 +1039,7 @@ class HomeFragment : BaseFragment() {
                         onFinish?.invoke()
                         val json = JSONObject(msg)
                         val numberCount = address.getDeviceTypeNumberCount()
-                        for (temp in deviceList) {
+                        for (temp in deviceList!!) {
                             if (temp.address.id == address.id) {
                                 if (temp.number >= 1 && temp.number <= numberCount) {
                                     temp.open =
@@ -1028,7 +1112,7 @@ class HomeFragment : BaseFragment() {
                     onFinish?.invoke()
                     if (response is KBoxState && response.succeed) {
                         val stateArray = response.body().split(",")
-                        for (temp in deviceList) {
+                        for (temp in deviceList!!) {
                             if (temp.address.id == address.id) {
                                 if (temp.number >= 1 && temp.number <= stateArray.size) {
                                     temp.state = stateArray[temp.number - 1]
@@ -1049,7 +1133,7 @@ class HomeFragment : BaseFragment() {
                     override fun onSubscribe(msg: String) {
                         onFinish?.invoke()
                         val json = JSONObject(msg)
-                        for (temp in deviceList) {
+                        for (temp in deviceList!!) {
                             if (temp.address.id == address.id) {
                                 if (temp.number >= 1 && temp.number <= temp.address.getDeviceTypeNumberCount()) {
                                     temp.state = json.optJSONObject("dimmer${temp.number}")
@@ -1101,15 +1185,15 @@ class HomeFragment : BaseFragment() {
                     override fun onSubscribe(msg: String) {
                         onFinish?.invoke()
                         val json = JSONObject(msg)
-                        for (temp in deviceList) {
+                        for (temp in deviceList!!) {
                             if (temp.address.id == address.id) {
-                                if (msg.contains("D1") && (temp.number >= 1 || temp.number <= 4)) {
+                                if (msg.contains("D1") && temp.number >= 1 && temp.number <= 4) {
                                     temp.state = json.optJSONObject("D${(temp.number - 1) * 4 + 1}")
                                         ?.optString("on") + "," + json.optJSONObject("D${(temp.number - 1) * 4 + 2}")
                                         ?.optString("on") + "," + json.optJSONObject("D${(temp.number - 1) * 4 + 3}")
                                         ?.optString("on") + "," + json.optJSONObject("D${(temp.number - 1) * 4 + 4}")
                                         ?.optString("on")
-                                } else if (msg.contains("A1") && (temp.number >= 5 || temp.number <= 8)) {
+                                } else if (msg.contains("A1") && temp.number >= 5 && temp.number <= 8) {
                                     temp.state = json.optJSONObject("A${(temp.number - 5) * 4 + 1}")
                                         ?.optString("value") + "," + json.optJSONObject("A${(temp.number - 5) * 4 + 2}")
                                         ?.optString("value") + "," + json.optJSONObject("A${(temp.number - 5) * 4 + 3}")
@@ -1153,147 +1237,11 @@ class HomeFragment : BaseFragment() {
     }
 
     /**
-     * 当前添加设备弹窗选中的设备类型，默认选中2路继电器
-     */
-    private var selectedDeviceType: Int = DeviceType.Relay_2.value
-
-    /**
-     * 当前添加设备弹窗选中的设备协议类型，默认自定义TCP
-     */
-    private var protocolType: Int = ProtocolType.TCP.value
-
-    /**
      * 添加设备弹窗
      */
     private fun showAddDeviceDialog() {
-        if (context != null) {
-            val view = LayoutInflater.from(context).inflate(R.layout.dialog_add, null)
-            val ip = view.findViewById<EditText>(R.id.ip)
-            val port = view.findViewById<EditText>(R.id.port)
-            val model = view.findViewById<AppCompatSpinner>(R.id.model)
-            val protocol = view.findViewById<AppCompatSpinner>(R.id.protocol);
-            val llDeviceId = view.findViewById<View>(R.id.ll_device_id);
-            val llUserName = view.findViewById<View>(R.id.ll_user_name);
-            val llPassword = view.findViewById<View>(R.id.ll_password);
-            val deviceId = view.findViewById<EditText>(R.id.device_id);
-            val userName = view.findViewById<EditText>(R.id.user_name);
-            val password = view.findViewById<EditText>(R.id.password);
-            selectedDeviceType = DeviceType.Relay_2.value
-            model.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>,
-                    view: View,
-                    position: Int,
-                    id: Long
-                ) {
-                    when (position) {
-                        0 -> {
-                            selectedDeviceType = DeviceType.Relay_2.value
-                            protocol.isEnabled = true
-                        }
-                        1 -> {
-                            selectedDeviceType = DeviceType.Relay_4.value
-                            protocol.isEnabled = true
-                        }
-                        2 -> {
-                            selectedDeviceType = DeviceType.Relay_8.value
-                            protocol.isEnabled = true
-                        }
-                        3 -> {
-                            selectedDeviceType = DeviceType.Relay_16.value
-                            protocol.isEnabled = true
-                        }
-                        4 -> {
-                            selectedDeviceType = DeviceType.Relay_32.value
-                            protocol.isEnabled = true
-                        }
-                        5 -> {
-                            selectedDeviceType = DeviceType.Dimmer_8.value
-                            protocol.isEnabled = true
-                        }
-                        6 -> {
-                            selectedDeviceType = DeviceType.COLB.value
-                            protocol.setSelection(1)
-                            protocol.isEnabled = false
-                        }
-                    }
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                }
-            }
-            protocolType = ProtocolType.TCP.value
-            llDeviceId.visibility = View.GONE
-            llUserName.visibility = View.GONE
-            llPassword.visibility = View.GONE
-            protocol.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>,
-                    view: View,
-                    position: Int,
-                    id: Long
-                ) {
-                    when (position) {
-                        0 -> {
-                            protocolType = ProtocolType.TCP.value
-                            llDeviceId.visibility = View.GONE
-                            llUserName.visibility = View.GONE
-                            llPassword.visibility = View.GONE
-                        }
-                        1 -> {
-                            protocolType = ProtocolType.MQTT.value
-                            llDeviceId.visibility = View.VISIBLE
-                            llUserName.visibility = View.VISIBLE
-                            llPassword.visibility = View.VISIBLE
-                        }
-                    }
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {
-
-                }
-            }
-            val dialog = AlertDialog.Builder(context!!)
-                .setCancelable(true)
-                .setView(view)
-                .setNegativeButton(resources.getString(R.string.cancel)) { _, _ ->
-
-                }
-                .setPositiveButton(resources.getString(R.string.confirm)) { _, _ ->
-                    if (port.text.toString().isEmpty()) {
-                        showToast(resources.getString(R.string.port_alert))
-                        return@setPositiveButton
-                    }
-                    if (protocolType == ProtocolType.MQTT.value) {
-                        if (deviceId.text.toString().isEmpty()) {
-                            showToast(resources.getString(R.string.device_id_input))
-                            return@setPositiveButton
-                        }
-                        if (userName.text.toString().isEmpty()) {
-                            showToast(resources.getString(R.string.user_name_input))
-                            return@setPositiveButton
-                        }
-                        if (password.text.toString().isEmpty()) {
-                            showToast(resources.getString(R.string.password_input))
-                            return@setPositiveButton
-                        }
-                    }
-                    val ipAddress = IPAddress(
-                        ip.text.toString(),
-                        Integer.decode(port.text.toString()),
-                        selectedDeviceType,
-                        protocolType,
-                        userName.text.toString(),
-                        password.text.toString(),
-                        deviceId.text.toString()
-                    )
-
-                    addDevice(ipAddress)
-                }
-                .create()
-            dialog.show()
-        }
+        val intent = Intent(activity!!, AddDeviceActivity::class.java)
+        startActivityForResult(intent, 2001)
     }
 
     /**

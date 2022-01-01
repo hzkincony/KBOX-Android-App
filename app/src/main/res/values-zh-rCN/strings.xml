@@ -86,5 +86,13 @@
     <string name="ignoring_battery_optimizations">忽略电池优化</string>
     <string name="ignoring_battery_optimizations_fail">忽略电池优化失败</string>
     <string name="boot_start_management">后台启动管理</string>
-
+    <string name="history">历史</string>
+    <string name="label_address">地址:</string>
+    <string name="label_ip">IP地址:</string>
+    <string name="label_port">端口:</string>
+    <string name="label_model">设备类型:</string>
+    <string name="label_protocol">协议类型:</string>
+    <string name="label_device_id">设备ID:</string>
+    <string name="label_user_name">账号:</string>
+    <string name="label_password">密码:</string>
 </resources>
