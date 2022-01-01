@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -55,7 +56,8 @@
                 android:paddingTop="10dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="10dp"
-                android:src="@drawable/ic_arrow" />
+                android:src="@drawable/ic_arrow"
+                app:tint="@color/text666" />
 
         </RelativeLayout>
 
@@ -82,8 +84,10 @@
                 android:paddingLeft="5dp"
                 android:paddingTop="10dp"
                 android:paddingRight="5dp"
+
                 android:paddingBottom="10dp"
-                android:src="@drawable/ic_arrow" />
+                android:src="@drawable/ic_arrow"
+                app:tint="@color/text666" />
 
         </RelativeLayout>
 
@@ -111,39 +115,97 @@
                 android:paddingTop="10dp"
                 android:paddingRight="5dp"
                 android:paddingBottom="10dp"
-                android:src="@drawable/ic_arrow" />
+                android:src="@drawable/ic_arrow"
+                app:tint="@color/text666" />
 
         </RelativeLayout>
 
         <include layout="@layout/item_line" />
 
-<!--        <RelativeLayout-->
-<!--            android:id="@+id/boot_start_management"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="50dp"-->
-<!--            android:background="@color/white">-->
+        <RelativeLayout
+            android:id="@+id/load_address"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/white">
 
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_marginLeft="20dp"-->
-<!--                android:gravity="center"-->
-<!--                android:text="@string/boot_start_management"-->
-<!--                android:textColor="@color/text666" />-->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:gravity="center"
+                android:text="@string/load_address"
+                android:textColor="@color/text666" />
 
-<!--            <ImageView-->
-<!--                android:layout_width="50dp"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:layout_alignParentRight="true"-->
-<!--                android:paddingLeft="5dp"-->
-<!--                android:paddingTop="10dp"-->
-<!--                android:paddingRight="5dp"-->
-<!--                android:paddingBottom="10dp"-->
-<!--                android:src="@drawable/ic_arrow" />-->
+            <ImageView
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:paddingLeft="5dp"
+                android:paddingTop="10dp"
+                android:paddingRight="5dp"
+                android:paddingBottom="10dp"
+                android:src="@android:drawable/ic_menu_camera" />
 
-<!--        </RelativeLayout>-->
+        </RelativeLayout>
 
-<!--        <include layout="@layout/item_line" />-->
+        <include layout="@layout/item_line" />
+
+        <RelativeLayout
+            android:id="@+id/temperature_unit"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@color/white">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="20dp"
+                android:gravity="center"
+                android:text="@string/change_temperature_unit"
+                android:textColor="@color/text666" />
+
+
+            <TextView
+                android:id="@+id/tv_temperature_unit"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="20dp"
+                android:gravity="center"
+                android:text="℃"
+                android:textColor="@color/text666" />
+
+        </RelativeLayout>
+
+        <include layout="@layout/item_line" />
+
+        <!--        <RelativeLayout-->
+        <!--            android:id="@+id/boot_start_management"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="50dp"-->
+        <!--            android:background="@color/white">-->
+
+        <!--            <TextView-->
+        <!--                android:layout_width="wrap_content"-->
+        <!--                android:layout_height="match_parent"-->
+        <!--                android:layout_marginLeft="20dp"-->
+        <!--                android:gravity="center"-->
+        <!--                android:text="@string/boot_start_management"-->
+        <!--                android:textColor="@color/text666" />-->
+
+        <!--            <ImageView-->
+        <!--                android:layout_width="50dp"-->
+        <!--                android:layout_height="match_parent"-->
+        <!--                android:layout_alignParentRight="true"-->
+        <!--                android:paddingLeft="5dp"-->
+        <!--                android:paddingTop="10dp"-->
+        <!--                android:paddingRight="5dp"-->
+        <!--                android:paddingBottom="10dp"-->
+        <!--                android:src="@drawable/ic_arrow" />-->
+
+        <!--        </RelativeLayout>-->
+
+        <!--        <include layout="@layout/item_line" />-->
 
         <RelativeLayout
             android:id="@+id/version"
@@ -154,7 +216,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="20dp"
+                android:layout_marginLeft="22dp"
                 android:gravity="center"
                 android:text="@string/version"
                 android:textColor="@color/text666" />

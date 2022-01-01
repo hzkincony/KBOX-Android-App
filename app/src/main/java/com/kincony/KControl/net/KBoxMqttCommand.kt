@@ -5,11 +5,11 @@ import com.kincony.KControl.net.data.IPAddress
 object KBoxMqttCommand {
 
     fun subscribeTopic(ipAddress: IPAddress): String {
-        return "relay${ipAddress.getDeviceTypeNumberCount()}/${ipAddress.deviceId}/state"
+        return "relay${ipAddress.getDeviceTypeNumberCount()}/${ipAddress.deviceId}${ipAddress.devicePassword}/state"
     }
 
     fun publishTopic(ipAddress: IPAddress): String {
-        return "relay${ipAddress.getDeviceTypeNumberCount()}/${ipAddress.deviceId}/set"
+        return "relay${ipAddress.getDeviceTypeNumberCount()}/${ipAddress.deviceId}${ipAddress.devicePassword}/set"
     }
 
     fun readAllState(ipAddress: IPAddress): String {

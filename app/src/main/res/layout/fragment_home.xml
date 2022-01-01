@@ -25,9 +25,9 @@
             android:layout_height="match_parent"
             android:layout_toLeftOf="@+id/add"
             android:background="@drawable/selector_button"
+            android:gravity="center"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:gravity="center"
             android:text="@string/sort"
             android:textColor="@color/text666"
             android:textSize="16dp" />
@@ -36,19 +36,11 @@
             android:id="@+id/add"
             android:layout_width="@dimen/top_bar_height"
             android:layout_height="@dimen/top_bar_height"
-            android:clickable="true"
-            android:layout_toLeftOf="@+id/camera"
-            android:padding="10dp"
-            android:src="@android:drawable/ic_menu_edit" />
-
-        <ImageView
-            android:id="@+id/camera"
-            android:layout_width="@dimen/top_bar_height"
-            android:layout_height="@dimen/top_bar_height"
             android:layout_alignParentRight="true"
             android:clickable="true"
             android:padding="10dp"
-            android:src="@android:drawable/ic_menu_camera" />
+            android:src="@android:drawable/ic_menu_edit" />
+
     </RelativeLayout>
 
     <include layout="@layout/item_line" />

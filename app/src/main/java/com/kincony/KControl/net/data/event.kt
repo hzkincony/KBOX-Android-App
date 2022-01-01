@@ -15,7 +15,10 @@ class DeviceInPutChange(
     var id: Int,
     var name: String,
     var itemName: String,
-    var icon: Int
+    var icon: Int,
+    var max: String,
+    var min: String,
+    var unit: String
 )
 
 class IconEvent(var icon: Int, var code: Int)

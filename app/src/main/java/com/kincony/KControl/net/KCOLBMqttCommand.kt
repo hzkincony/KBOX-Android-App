@@ -5,11 +5,11 @@ import com.kincony.KControl.net.data.IPAddress
 object KCOLBMqttCommand {
 
     fun subscribeTopic(ipAddress: IPAddress): String {
-        return "COLB/${ipAddress.deviceId}/state"
+        return "COLB/${ipAddress.deviceId}${ipAddress.devicePassword}/state"
     }
 
     fun publishTopic(ipAddress: IPAddress): String {
-        return "COLB/${ipAddress.deviceId}/set"
+        return "COLB/${ipAddress.deviceId}${ipAddress.devicePassword}/set"
     }
 
     fun readAllDigitalInputState(): String {

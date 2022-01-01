@@ -41,6 +41,10 @@
     <string name="again">Press again to exit.</string>
 
     <string name="name_not_empty">Name can\'t be empty!</string>
+    <string name="max_not_empty">Max can\'t be empty!</string>
+    <string name="max_not_zero">Max can\'t be zero!</string>
+    <string name="min_not_empty">Min can\'t be empty!</string>
+    <string name="unit_not_empty">Unit can\'t be empty!</string>
 
     <string name="cancel">Cancel</string>
     <string name="confirm">OK</string>
@@ -86,6 +90,10 @@
     <string name="scan_qr_code_create_wrong">二维码创建失败</string>
     <string name="scan_qr_code_from_wrong">不支持的二维码</string>
     <string name="scan_qr_code_from_album_wrong">没有找到二维码</string>
+    <string name="load_address">从源手机还原配置</string>
+    <string name="share_address">分享配置</string>
+    <string name="change_temperature_unit">切换温度单位</string>
+    <string name="change_temperature_unit_to">切换温度单位为：</string>
 
     <string name="ignoring_battery_optimizations">Ignoring Battery Optimizations</string>
     <string name="ignoring_battery_optimizations_fail">Ignoring Battery Optimizations Fail</string>
@@ -97,7 +105,12 @@
     <string name="label_model">Model:</string>
     <string name="label_protocol">Protocol:</string>
     <string name="label_device_id">Device ID:</string>
-    <string name="label_user_name">User Name:</string>
-    <string name="label_password">Password:</string>
+    <string name="label_topic_password">Device Pwd:</string>
+    <string name="label_user_name">MQTT User:</string>
+    <string name="label_password">MQTT Pwd:</string>
+
+    <string name="label_max">Max:</string>
+    <string name="label_min">Min:</string>
+    <string name="label_unit">Unit:</string>
 
 </resources>

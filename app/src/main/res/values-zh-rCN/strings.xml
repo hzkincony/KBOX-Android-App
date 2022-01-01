@@ -21,14 +21,14 @@
     <string name="name">名称</string>
 
     <string name="InPutName">输入端口</string>
-    <string name="InPutName1">输入端口1</string>
-    <string name="InPutName2">输入端口2</string>
-    <string name="InPutName3">输入端口3</string>
-    <string name="InPutName4">输入端口4</string>
-    <string name="InPutName5">输入端口5</string>
-    <string name="InPutName6">输入端口6</string>
-    <string name="InPutName7">输入端口7</string>
-    <string name="InPutName8">输入端口8</string>
+    <string name="InPutName1">端口1</string>
+    <string name="InPutName2">端口2</string>
+    <string name="InPutName3">端口3</string>
+    <string name="InPutName4">端口4</string>
+    <string name="InPutName5">端口5</string>
+    <string name="InPutName6">端口6</string>
+    <string name="InPutName7">端口7</string>
+    <string name="InPutName8">端口8</string>
 
     <string name="Icon">图标</string>
     <string name="icon">图标</string>
@@ -40,6 +40,10 @@
     <string name="again">再按一次退出.</string>
 
     <string name="name_not_empty">名称不能为空!</string>
+    <string name="max_not_empty">最大值不能为空!</string>
+    <string name="max_not_zero">最大值不能为0!</string>
+    <string name="min_not_empty">最小值不能为空!</string>
+    <string name="unit_not_empty">单位不能为空!</string>
 
     <string name="cancel">取消</string>
     <string name="confirm">确认</string>
@@ -82,6 +86,10 @@
     <string name="scan_qr_code_create_wrong">二维码创建失败</string>
     <string name="scan_qr_code_from_wrong">不支持的二维码</string>
     <string name="scan_qr_code_from_album_wrong">没有找到二维码</string>
+    <string name="load_address">从源手机还原配置</string>
+    <string name="share_address">分享配置</string>
+    <string name="change_temperature_unit">切换温度单位</string>
+    <string name="change_temperature_unit_to">切换温度单位为：</string>
 
     <string name="ignoring_battery_optimizations">忽略电池优化</string>
     <string name="ignoring_battery_optimizations_fail">忽略电池优化失败</string>
@@ -93,6 +101,11 @@
     <string name="label_model">设备类型:</string>
     <string name="label_protocol">协议类型:</string>
     <string name="label_device_id">设备ID:</string>
-    <string name="label_user_name">账号:</string>
-    <string name="label_password">密码:</string>
+    <string name="label_topic_password">设备密码:</string>
+    <string name="label_user_name">MQTT账号:</string>
+    <string name="label_password">MQTT密码:</string>
+
+    <string name="label_max">最大:</string>
+    <string name="label_min">最小:</string>
+    <string name="label_unit">单位:</string>
 </resources>

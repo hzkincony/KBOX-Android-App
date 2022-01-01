@@ -1,13 +1,8 @@
 package com.kincony.KControl.ui.fragment
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.os.Build
 import android.text.TextUtils
-import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -37,7 +32,6 @@ import com.kincony.KControl.ui.adapter.device.DeviceAdapter
 import com.kincony.KControl.ui.adapter.device.DimmerDeviceConvert
 import com.kincony.KControl.ui.adapter.device.RelayDeviceConvert
 import com.kincony.KControl.ui.base.BaseFragment
-import com.kincony.KControl.ui.scan.ScanActivity
 import com.kincony.KControl.utils.KBoxStateRead
 import com.kincony.KControl.utils.ToastUtils
 import com.kincony.KControl.utils.Tools
@@ -104,7 +98,10 @@ class HomeFragment : BaseFragment() {
                     device.deviceId,
                     device.name,
                     device.icon,
-                    device.itemName
+                    device.itemName,
+                    device.max,
+                    device.min,
+                    device.unit
                 )
             }
 
@@ -140,7 +137,10 @@ class HomeFragment : BaseFragment() {
                     device.deviceId,
                     device.name,
                     device.icon,
-                    device.itemName
+                    device.itemName,
+                    device.max,
+                    device.min,
+                    device.unit
                 )
             }
         }
@@ -152,7 +152,10 @@ class HomeFragment : BaseFragment() {
                     device.deviceId,
                     device.name,
                     device.icon,
-                    device.itemName
+                    device.itemName,
+                    device.max,
+                    device.min,
+                    device.unit
                 )
             }
 
@@ -209,26 +212,6 @@ class HomeFragment : BaseFragment() {
             showAddDeviceDialog()
         }
 
-        // 扫描
-        camera.setOnClickListener {
-            if (activity == null) return@setOnClickListener
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (ContextCompat.checkSelfPermission(
-                        activity!!,
-                        Manifest.permission.CAMERA
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
-                    val intent = Intent(activity!!, ScanActivity::class.java)
-                    startActivityForResult(intent, 2000)
-                } else {
-                    requestPermissions(arrayOf(Manifest.permission.CAMERA), 1000)
-                }
-            } else {
-                val intent = Intent(activity!!, ScanActivity::class.java)
-                startActivityForResult(intent, 2000)
-            }
-        }
-
         // 注册event事件
         EventBus.getDefault().register(this)
 
@@ -239,120 +222,12 @@ class HomeFragment : BaseFragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == 2000 && resultCode == Activity.RESULT_OK) {
-            val scanResult = data?.getStringExtra("scan_result")
-            if (TextUtils.isEmpty(scanResult)) return
-            val unzip = Tools.unzip(scanResult!!)
-            if (!unzip.startsWith("{") || !unzip.endsWith("}")) {
-                ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
-                return
-            }
-            val shareQRCode = Tools.gson.fromJson<ShareQRCode>(unzip, ShareQRCode::class.java)
-            if (shareQRCode.allAddress == null || shareQRCode.allAddress.size == 0) {
-                ToastUtils.showToastLong(getString(R.string.scan_qr_code_from_wrong))
-                return
-            }
-
-            val newAddressIDMap = HashMap<Int, Int>()
-            val existsAddressList = ArrayList<IPAddress>()
-
-            shareQRCode.allAddress!!.forEach {
-                val temp = if (it.protocolType == ProtocolType.MQTT.value) {
-                    KBoxDatabase.getInstance(context).addressDao.getMQTTAddress(
-                        it.ip,
-                        it.port,
-                        it.deviceType,
-                        it.username,
-                        it.password,
-                        it.deviceId
-                    )
-                } else {
-                    KBoxDatabase.getInstance(context).addressDao.getTCPAddress(
-                        it.ip,
-                        it.port,
-                        it.deviceType
-                    )
-                }
-                if (temp == null) {
-                    val oldId = it.id;
-                    it.id = 0
-                    val newId = KBoxDatabase.getInstance(activity).addressDao.insertAddress(it)
-                    it.id = newId.toInt()
-                    newAddressIDMap.put(oldId, it.id)
-                } else {
-                    existsAddressList.add(temp)
-                }
-            }
-
-            val lastDevice = KBoxDatabase.getInstance(context).deviceDao.lastDevice
-            var deviceCount =
-                if (lastDevice != null && lastDevice.size == 1) lastDevice[0].index + 1 else 1
-            shareQRCode.allDevice?.forEach {
-                if (newAddressIDMap.get(it.addressId) != null) {
-                    it.index = deviceCount
-                    it.addressId = newAddressIDMap.get(it.addressId)!!.toInt()
-                    KBoxDatabase.getInstance(activity).deviceDao.insertDevice(it)
-                    deviceCount++
-                }
-            }
-
-            shareQRCode.allScene?.forEach {
-                val ids = it.ids.split("_")
-                var isAdd = true
-                for ((index, item) in ids.withIndex()) {
-                    if (newAddressIDMap.get(item.toInt()) == null) {
-                        isAdd = false
-                        break
-                    }
-                    if (index == 0) {
-                        it.ids = "${newAddressIDMap.get(item.toInt())!!.toInt()}"
-                    } else {
-                        it.ids += "_${newAddressIDMap.get(item.toInt())!!.toInt()}"
-                    }
-                }
-                if (isAdd) {
-                    it.id = 0
-                    KBoxDatabase.getInstance(activity).sceneDao.insertScene(it)
-                }
-            }
-
-            // 加载设备数据
-            loadDevice()
-            // 加载
-            loadScene()
-
-            if (existsAddressList.size > 0) {
-                var message = ""
-                for (ipAddress in existsAddressList) {
-                    if (ProtocolType.MQTT.value == ipAddress.protocolType) {
-                        message += "${ipAddress.getDeviceTypeName(activity!!)}:\n${ipAddress.deviceId}\n"
-                    } else {
-                        message += "${ipAddress.getDeviceTypeName(activity!!)}:\n${ipAddress.ip}:${ipAddress.port}\n"
-                    }
-                }
-                AlertDialog.Builder(activity!!)
-                    .setTitle(resources.getString(R.string.add_already))
-                    .setMessage(message)
-                    .setPositiveButton(resources.getString(R.string.confirm), null)
-                    .create()
-                    .show()
-            }
-        } else
-            if (requestCode == 2001 && resultCode == Activity.RESULT_OK) {
-                val deviceResult = data?.getStringExtra("device_result")
-                if (TextUtils.isEmpty(deviceResult)) return
-                val json = JSONObject(deviceResult!!)
-                val ipAddress = IPAddress(
-                    json.optString("ip"),
-                    Integer.decode(json.optString("port")),
-                    json.optInt("deviceType"),
-                    json.optInt("protocolType"),
-                    json.optString("userName"),
-                    json.optString("password"),
-                    json.optString("deviceId")
-                )
-                addDevice(ipAddress)
-            }
+        if (requestCode == 2001 && resultCode == Activity.RESULT_OK) {
+            val deviceResult = data?.getStringExtra("device_result")
+            if (TextUtils.isEmpty(deviceResult)) return
+            val ipAddress = Tools.gson.fromJson<IPAddress>(deviceResult, IPAddress::class.java)
+            addDevice(ipAddress)
+        }
         super.onActivityResult(requestCode, resultCode, data)
     }
 
@@ -397,6 +272,9 @@ class HomeFragment : BaseFragment() {
         d?.name = event.name
         d?.itemName = event.itemName
         d?.icon = event.icon
+        d?.max = event.max
+        d?.min = event.min
+        d?.unit = event.unit
 
         if (d != null) {
             KBoxDatabase.getInstance(context).deviceDao.updateDevice(d)
@@ -512,6 +390,9 @@ class HomeFragment : BaseFragment() {
                 } else if (channelDevice.number in 5..8) {
                     channelDevice.itemName =
                         "A${(channelDevice.number - 5) * 4 + 1};A${(channelDevice.number - 5) * 4 + 2};A${(channelDevice.number - 5) * 4 + 3};A${(channelDevice.number - 5) * 4 + 4}"
+                    channelDevice.max = "5;5;5;5"
+                    channelDevice.min = "0;0;0;0"
+                    channelDevice.unit = " ; ; ; "
                 } else if (channelDevice.number == 9) {
                     channelDevice.itemName = "T1;T2;T3;T4;T5"
                 }

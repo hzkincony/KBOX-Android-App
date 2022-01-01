@@ -102,6 +102,21 @@ public class Device implements MultiItemEntity {
      */
     public String state;
 
+    /**
+     * 最大值
+     */
+    public String max;
+
+    /**
+     * 最小值
+     */
+    public String min;
+
+    /**
+     * 单位
+     */
+    public String unit;
+
     public Device() {
     }
 

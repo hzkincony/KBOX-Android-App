@@ -1,5 +1,6 @@
 package com.kincony.KControl.ui.adapter.device
 
+import android.text.TextUtils
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -8,18 +9,24 @@ import com.chad.library.adapter.base.viewholder.BaseViewHolder
 import com.kincony.KControl.R
 import com.kincony.KControl.net.data.Device
 import com.kincony.KControl.utils.ImageLoader
-import java.util.concurrent.ScheduledFuture
+import com.kincony.KControl.utils.SPUtils
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 class CLOBDeviceConvert(adapter: DeviceAdapter) : AbsBaseDeviceConvert(adapter) {
-    private var task: ScheduledFuture<*>? = null
+    private var decimalFormat: DecimalFormat? = null
 
-    override fun getLayoutId(): Int = R.layout.item_device_clob
+    override fun getLayoutId(): Int {
+        decimalFormat = DecimalFormat("#0.00")
+        decimalFormat!!.roundingMode = RoundingMode.HALF_UP
+        return R.layout.item_device_clob
+    }
 
     override fun convert(baseViewHolder: BaseViewHolder, device: Device) {
-        val name =  baseViewHolder.getView<TextView>(R.id.name)
+        val name = baseViewHolder.getView<TextView>(R.id.name)
         name.text = device.name
 
-        val icon =  baseViewHolder.getView<ImageView>(R.id.icon)
+        val icon = baseViewHolder.getView<ImageView>(R.id.icon)
         ImageLoader.load(adapter.mContext, device.icon, icon)
 
         val llD = baseViewHolder.getView<LinearLayout>(R.id.ll_D)
@@ -84,19 +91,27 @@ class CLOBDeviceConvert(adapter: DeviceAdapter) : AbsBaseDeviceConvert(adapter) 
             val a3n = baseViewHolder.getView<TextView>(R.id.a3n)
             val a4n = baseViewHolder.getView<TextView>(R.id.a4n)
             val d = device.state.split(",")
+            val max = device.max.split(";")
+            val min = device.min.split(";")
+            val unit = device.unit.split(";")
             for ((index, value) in d.withIndex()) {
+                val str = if (TextUtils.isEmpty(value)) {
+                    value
+                } else {
+                    "${decimalFormat!!.format(value.toFloat() / 5.0 * (max[index].toFloat() - min[index].toFloat()) + min[index].toFloat())}${unit[index]}"
+                }
                 when (index) {
                     0 -> {
-                        a1.setText(value)
+                        a1.setText(str)
                     }
                     1 -> {
-                        a2.setText(value)
+                        a2.setText(str)
                     }
                     2 -> {
-                        a3.setText(value)
+                        a3.setText(str)
                     }
                     3 -> {
-                        a4.setText(value)
+                        a4.setText(str)
                     }
                 }
             }
@@ -133,19 +148,40 @@ class CLOBDeviceConvert(adapter: DeviceAdapter) : AbsBaseDeviceConvert(adapter) 
             for ((index, value) in t.withIndex()) {
                 when (index) {
                     0 -> {
-                        t1.setText(value)
+                        if (SPUtils.getTemperatureUnit() == "℉") {
+                            t1.setText("${decimalFormat!!.format(value.toFloat() * 9.0 / 5.0 + 32.0)}℉")
+                        } else {
+                            t1.setText("$value℃")
+                        }
+
                     }
                     1 -> {
-                        t2.setText(value)
+                        if (SPUtils.getTemperatureUnit() == "℉") {
+                            t2.setText("${decimalFormat!!.format(value.toFloat() * 9.0 / 5.0 + 32.0)}℉")
+                        } else {
+                            t2.setText("$value℃")
+                        }
                     }
                     2 -> {
-                        t3.setText(value)
+                        if (SPUtils.getTemperatureUnit() == "℉") {
+                            t3.setText("${decimalFormat!!.format(value.toFloat() * 9.0 / 5.0 + 32.0)}℉")
+                        } else {
+                            t3.setText("$value℃")
+                        }
                     }
                     3 -> {
-                        t4.setText(value)
+                        if (SPUtils.getTemperatureUnit() == "℉") {
+                            t4.setText("${decimalFormat!!.format(value.toFloat() * 9.0 / 5.0 + 32.0)}℉")
+                        } else {
+                            t4.setText("$value℃")
+                        }
                     }
                     4 -> {
-                        t5.setText(value)
+                        if (SPUtils.getTemperatureUnit() == "℉") {
+                            t5.setText("${decimalFormat!!.format(value.toFloat() * 9.0 / 5.0 + 32.0)}℉")
+                        } else {
+                            t5.setText("$value℃")
+                        }
                     }
                 }
             }

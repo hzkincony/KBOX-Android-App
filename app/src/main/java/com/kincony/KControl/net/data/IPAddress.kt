@@ -24,6 +24,7 @@ class IPAddress {
 
     var deviceId: String? = null
 
+    var devicePassword:String? = null
 
     fun getDeviceTypeNumberCount(): Int {
         return Tools.getDeviceTypeEnum(deviceType).numberCount
@@ -47,7 +48,8 @@ class IPAddress {
         protocolType: Int,
         username: String?,
         password: String?,
-        deviceId: String?
+        deviceId: String?,
+        devicePassword: String?
     ) {
         this.ip = ip
         this.port = port
@@ -56,6 +58,7 @@ class IPAddress {
         this.username = username
         this.password = password
         this.deviceId = deviceId
+        this.devicePassword = devicePassword
     }
 
     override fun equals(other: Any?): Boolean {

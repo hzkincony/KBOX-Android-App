@@ -11,6 +11,7 @@ import android.widget.AdapterView
 import androidx.core.content.ContextCompat
 import com.kincony.KControl.R
 import com.kincony.KControl.net.data.DeviceType
+import com.kincony.KControl.net.data.IPAddress
 import com.kincony.KControl.net.data.ProtocolType
 import com.kincony.KControl.ui.base.BaseActivity
 import com.kincony.KControl.ui.scan.ScanActivity
@@ -97,12 +98,18 @@ class AddDeviceActivity : BaseActivity() {
                         llDeviceId.visibility = View.GONE
                         llUserName.visibility = View.GONE
                         llPassword.visibility = View.GONE
+                        llDevicePassword.visibility = View.GONE
+                        deviceId.setText("")
+                        userName.setText("")
+                        password.setText("")
+                        devicePassword.setText("")
                     }
                     1 -> {
                         selectedProtocolType = ProtocolType.MQTT.value
                         llDeviceId.visibility = View.VISIBLE
                         llUserName.visibility = View.VISIBLE
                         llPassword.visibility = View.VISIBLE
+                        llDevicePassword.visibility = View.VISIBLE
                     }
                 }
             }
@@ -162,18 +169,18 @@ class AddDeviceActivity : BaseActivity() {
                     return@setOnClickListener
                 }
             }
-
-            val jsonObject = JSONObject()
-            jsonObject.put("ip", ip.text.toString())
-            jsonObject.put("port", Integer.decode(port.text.toString()))
-            jsonObject.put("deviceType", selectedDeviceType)
-            jsonObject.put("protocolType", selectedProtocolType)
-            jsonObject.put("userName", userName.text.toString())
-            jsonObject.put("password", password.text.toString())
-            jsonObject.put("deviceId", deviceId.text.toString())
-
+            val ipAddress = IPAddress(
+                ip.text.toString(),
+                Integer.decode(port.text.toString()),
+                selectedDeviceType,
+                selectedProtocolType,
+                userName.text.toString(),
+                password.text.toString(),
+                deviceId.text.toString(),
+                devicePassword.text.toString()
+            )
             val result = Intent()
-            result.putExtra("device_result", jsonObject.toString())
+            result.putExtra("device_result", Tools.gson.toJson(ipAddress))
             setResult(RESULT_OK, result)
 
             finish()

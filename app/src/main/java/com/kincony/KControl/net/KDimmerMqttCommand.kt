@@ -6,11 +6,11 @@ import org.json.JSONObject
 object KDimmerMqttCommand {
 
     fun subscribeTopic(ipAddress: IPAddress): String {
-        return "dimmer/${ipAddress.deviceId}/state"
+        return "dimmer/${ipAddress.deviceId}${ipAddress.devicePassword}/state"
     }
 
     fun publishTopic(ipAddress: IPAddress): String {
-        return "dimmer/${ipAddress.deviceId}/set"
+        return "dimmer/${ipAddress.deviceId}${ipAddress.devicePassword}/set"
     }
 
     fun readAll(): String {

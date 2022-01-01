@@ -65,7 +65,7 @@
             android:paddingRight="15dp">
 
             <TextView
-                android:layout_width="90dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:text="@string/label_ip"
@@ -98,7 +98,7 @@
             android:paddingRight="15dp">
 
             <TextView
-                android:layout_width="90dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:text="@string/label_port"
@@ -131,7 +131,7 @@
             android:paddingRight="15dp">
 
             <TextView
-                android:layout_width="90dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:text="@string/label_model"
@@ -165,7 +165,7 @@
             android:paddingRight="15dp">
 
             <TextView
-                android:layout_width="90dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:text="@string/label_protocol"
@@ -198,10 +198,10 @@
             android:orientation="horizontal"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <TextView
-                android:layout_width="90dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:text="@string/label_device_id"
@@ -219,6 +219,7 @@
                 android:gravity="center_vertical"
                 android:hint="@string/device_id_input"
                 android:lines="1"
+                android:singleLine="true"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:textSize="14dp" />
@@ -233,6 +234,41 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/llDevicePassword"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/label_topic_password"
+                android:textColor="@color/press"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/devicePassword"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#eeeeee"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:hint="@string/password_input"
+                android:inputType="textPassword"
+                android:lines="1"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textSize="14dp" />
+        </LinearLayout>
+        
+        <LinearLayout
             android:id="@+id/llUserName"
             android:layout_width="match_parent"
             android:layout_height="30dp"
@@ -243,7 +279,7 @@
             android:visibility="gone">
 
             <TextView
-                android:layout_width="90dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:text="@string/label_user_name"
@@ -277,7 +313,7 @@
             android:visibility="gone">
 
             <TextView
-                android:layout_width="90dp"
+                android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
                 android:text="@string/label_password"

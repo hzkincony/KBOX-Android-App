@@ -44,8 +44,8 @@
 
             <View
                 android:id="@+id/d1"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:background="@drawable/shape_circle_view_green" />
 
             <TextView
@@ -67,8 +67,8 @@
 
             <View
                 android:id="@+id/d2"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:background="@drawable/shape_circle_view_green" />
 
             <TextView
@@ -90,8 +90,8 @@
 
             <View
                 android:id="@+id/d3"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:background="@drawable/shape_circle_view_green" />
 
             <TextView
@@ -113,8 +113,8 @@
 
             <View
                 android:id="@+id/d4"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:background="@drawable/shape_circle_view_green" />
 
             <TextView

@@ -48,38 +48,11 @@ class AddressActivity : BaseActivity() {
         }
 
         iv_qr_code.setOnClickListener {
-            val allAddress = KBoxDatabase.getInstance(this).addressDao.allAddress
-            val allDevice = KBoxDatabase.getInstance(this).deviceDao.allDevice
-            val allScene = KBoxDatabase.getInstance(this).sceneDao.allScene
-            val shareQRCode = ShareQRCode()
-            shareQRCode.allAddress = allAddress
-            shareQRCode.allScene = allScene
-            shareQRCode.allDevice = allDevice
-            val content = Tools.zip(Tools.gson.toJson(shareQRCode))
-            val bitmap =
-                createQRCodeBitmap(
-                    content,
-                    480,
-                    480,
-                    "UTF-8",
-                    "L",
-                    "1",
-                    Color.BLACK,
-                    Color.WHITE
-                )
-            if (bitmap != null) {
-                val view =
-                    LayoutInflater.from(this@AddressActivity).inflate(R.layout.dialog_qrcode, null)
-                view.findViewById<ImageView>(R.id.qr_code).setImageBitmap(bitmap)
-                AlertDialog.Builder(this@AddressActivity)
-                    .setCancelable(true)
-                    .setView(view)
-                    .setPositiveButton(resources.getString(R.string.confirm), null)
-                    .create()
-                    .show()
-            } else {
-                ToastUtils.showToastLong(getString(R.string.scan_qr_code_create_wrong))
-            }
+            showQRCodeView()
+        }
+
+        tv_qr_code.setOnClickListener {
+            showQRCodeView()
         }
 
         recycler.adapter = adapter
@@ -92,6 +65,41 @@ class AddressActivity : BaseActivity() {
             var address = list[position]
             getLoadingDialog(this@AddressActivity, address)?.show()
             false
+        }
+    }
+
+    private fun showQRCodeView() {
+        val allAddress = KBoxDatabase.getInstance(this).addressDao.allAddress
+        val allDevice = KBoxDatabase.getInstance(this).deviceDao.allDevice
+        val allScene = KBoxDatabase.getInstance(this).sceneDao.allScene
+        val shareQRCode = ShareQRCode()
+        shareQRCode.allAddress = allAddress
+        shareQRCode.allScene = allScene
+        shareQRCode.allDevice = allDevice
+        val content = Tools.zip(Tools.gson.toJson(shareQRCode))
+        val bitmap =
+            createQRCodeBitmap(
+                content,
+                480,
+                480,
+                "UTF-8",
+                "L",
+                "1",
+                Color.BLACK,
+                Color.WHITE
+            )
+        if (bitmap != null) {
+            val view =
+                LayoutInflater.from(this@AddressActivity).inflate(R.layout.dialog_qrcode, null)
+            view.findViewById<ImageView>(R.id.qr_code).setImageBitmap(bitmap)
+            AlertDialog.Builder(this@AddressActivity)
+                .setCancelable(true)
+                .setView(view)
+                .setPositiveButton(resources.getString(R.string.confirm), null)
+                .create()
+                .show()
+        } else {
+            ToastUtils.showToastLong(getString(R.string.scan_qr_code_create_wrong))
         }
     }
 
