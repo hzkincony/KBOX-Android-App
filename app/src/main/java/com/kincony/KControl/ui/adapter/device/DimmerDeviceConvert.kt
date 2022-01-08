@@ -58,6 +58,7 @@ class DimmerDeviceConvert(adapter: DeviceAdapter) : AbsBaseDeviceConvert(adapter
             seekBar.max = 99
             seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 var isUserTouch = false
+                var changeRunnable:Runnable? = null
 
                 override fun onProgressChanged(
                     seekBar: SeekBar?,
@@ -68,7 +69,12 @@ class DimmerDeviceConvert(adapter: DeviceAdapter) : AbsBaseDeviceConvert(adapter
                         device.state = "$progress"
                         tvBrightness.text = device.state
                         updateAllChannelDeviceItem(device)
-                        callback?.onProgressChange(baseViewHolder.adapterPosition, device, progress)
+                        if (changeRunnable != null) {
+                            seekBar?.removeCallbacks(changeRunnable)
+                        }
+                        changeRunnable = Runnable { callback?.onProgressChange(baseViewHolder.adapterPosition, device, progress) }
+                        seekBar?.postDelayed(changeRunnable, 300)
+//                        callback?.onProgressChange(baseViewHolder.adapterPosition, device, progress)
                     }
                 }
 

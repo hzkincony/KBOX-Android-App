@@ -425,7 +425,7 @@ class HomeFragment : BaseFragment() {
             }
         }
         when (address.deviceType) {
-            DeviceType.Relay_2.value,
+//            DeviceType.Relay_2.value,
             DeviceType.Relay_4.value,
             DeviceType.Relay_8.value,
             DeviceType.Relay_16.value,
@@ -842,7 +842,8 @@ class HomeFragment : BaseFragment() {
             MqttClientManager.publish(
                 device.address,
                 KBoxMqttCommand.publishTopic(device.address),
-                KBoxMqttCommand.setState(device.number, if (open) 1 else 0)
+                KBoxMqttCommand.setState(device.number, if (open) 1 else 0),
+                true
             )
         }
     }
@@ -878,7 +879,8 @@ class HomeFragment : BaseFragment() {
             MqttClientManager.publish(
                 device.address,
                 KDimmerMqttCommand.publishTopic(device.address),
-                KDimmerMqttCommand.setDimmer(device.number, device.state.toInt())
+                KDimmerMqttCommand.setDimmer(device.number, device.state.toInt()),
+                true
             )
         }
     }

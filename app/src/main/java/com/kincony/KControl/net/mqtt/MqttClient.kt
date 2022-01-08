@@ -46,6 +46,7 @@ class MqttClient(
     val publishEventList: ArrayList<MqttPublishEvent> = ArrayList()
     var reconnectCallback: MqttConnectCallback? = null
     var isSubACK: Boolean = false
+    var ignoreCount: Int = 0
 
     fun connect(connectCallback: MqttConnectCallback) {
         if (state != CONNECTING && state != CONNECTED) {
@@ -103,13 +104,16 @@ class MqttClient(
         }
     }
 
-    fun publish(topic: String, message: String) {
+    fun publish(topic: String, message: String, ignore: Boolean = false) {
         if (state == CONNECTED && isSubACK) {
             val publishMessage = MqttMessageHelper.publishMessage(topic, message, getMessageId())
             LogUtils.d("MQTT[${clientId}] SEND_PUB ${topic} ${message}")
             channel?.writeAndFlush(publishMessage)
         } else {
             publishEventList.add(MqttPublishEvent(topic, message))
+        }
+        if (ignore) {
+            ignoreCount++
         }
     }
 

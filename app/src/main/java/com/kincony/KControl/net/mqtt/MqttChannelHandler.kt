@@ -108,7 +108,11 @@ class MqttChannelHandler(
         client.subscribeEventList.forEach {
             if (it.topic == topic && utf8Message.startsWith("{") && utf8Message.endsWith("}")) {
                 it.lastMessage = utf8Message
-                it.callback?.onSubscribe(utf8Message)
+                if (client.ignoreCount <= 0) {
+                    it.callback?.onSubscribe(utf8Message)
+                } else {
+                    client.ignoreCount--
+                }
             }
         }
     }

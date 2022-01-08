@@ -104,6 +104,7 @@ object MqttClientManager {
         ipAddress: IPAddress,
         topic: String,
         message: String,
+        isIgnore: Boolean = false,
         callback: MqttPublishCallback? = null
     ) {
         connect(ipAddress, object : MqttConnectCallback {
@@ -111,7 +112,7 @@ object MqttClientManager {
                 mainThread.postDelayed({
                     lastPublishCount--
                     LogUtils.d("MQTT[${client.clientId}] PUBLISH ${topic} ${message}")
-                    client.publish(topic, message)
+                    client.publish(topic, message, isIgnore)
                 }, 300L * lastPublishCount++)
 
                 if (callback != null) {
