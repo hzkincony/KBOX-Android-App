@@ -1,5 +1,7 @@
 package com.kincony.KControl.net.mqtt
 
+import com.kincony.KControl.App
+import com.kincony.KControl.R
 import com.kincony.KControl.net.mqtt.callback.MqttConnectCallback
 import com.kincony.KControl.net.mqtt.callback.MqttSubscribeCallback
 import com.kincony.KControl.net.mqtt.event.MqttPublishEvent
@@ -30,6 +32,7 @@ class MqttClient(
         const val DISCONNECTED = 5
         const val DISCONNECTING = 6
         const val ERROR = 7
+        const val CLOSE = 8
     }
 
     private var channel: Channel? = null
@@ -41,19 +44,18 @@ class MqttClient(
         return ++messageId
     }
 
+    private val workerGroup: EventLoopGroup = NioEventLoopGroup()
+    private val bootstrap = Bootstrap()
     var state = INIT
     val subscribeEventList: ArrayList<MqttSubscribeEvent> = ArrayList()
     val publishEventList: ArrayList<MqttPublishEvent> = ArrayList()
     var reconnectCallback: MqttConnectCallback? = null
     var isSubACK: Boolean = false
     var ignoreCount: Int = 0
+    var needReconnect: Boolean = false
 
     fun connect(connectCallback: MqttConnectCallback) {
-        if (state != CONNECTING && state != CONNECTED) {
-            state = CONNECTING
-            reconnectCallback = connectCallback
-            val workerGroup: EventLoopGroup = NioEventLoopGroup()
-            val bootstrap = Bootstrap()
+        if (state == INIT) {
             bootstrap.group(workerGroup)
             bootstrap.channel(NioSocketChannel::class.java)
             bootstrap.option(ChannelOption.SO_KEEPALIVE, true)
@@ -65,27 +67,35 @@ class MqttClient(
 //                    ch.pipeline().addLast(IdleStateHandler(60, 60, 0))
 //                    ch.pipeline().addLast(MqttPingHandler(this@MqttClient, 30))
                     ch.pipeline()
-                        .addLast(MqttChannelHandler(this@MqttClient, object : MqttConnectCallback {
+                        .addLast(
+                            MqttChannelHandler(
+                                this@MqttClient,
+                                object : MqttConnectCallback {
 
-                            override fun onSuccess(client: MqttClient) {
-                                state = CONNECTED
-                                reconnectCallback?.onSuccess(this@MqttClient)
-                            }
+                                    override fun onSuccess(client: MqttClient) {
+                                        state = CONNECTED
+                                        reconnectCallback?.onSuccess(this@MqttClient)
+                                    }
 
-                            override fun onFail(msg: String) {
-                                state = CONNECTED_FAIL
-                                reconnectCallback?.onFail(msg)
-                            }
-                        }))
+                                    override fun onFail(msg: String) {
+                                        state = CONNECTED_FAIL
+                                        reconnectCallback?.onFail(msg)
+                                    }
+                                })
+                        )
                 }
             })
+        }
+        if (state != CONNECTING && state != CONNECTED) {
+            state = CONNECTING
+            reconnectCallback = connectCallback
             bootstrap.connect(ip, port.toInt()).addListener(object : ChannelFutureListener {
                 override fun operationComplete(future: ChannelFuture) {
                     if (future.isSuccess) {
                         channel = future.channel()
                     } else {
                         state = CONNECTED_FAIL
-                        reconnectCallback?.onFail("Connect Fail!")
+                        reconnectCallback?.onFail(App.application.getString(R.string.connect_fail))
                     }
                 }
             })
@@ -158,4 +168,12 @@ class MqttClient(
         }
     }
 
+    fun close() {
+        try {
+            state = CLOSE
+            workerGroup.shutdownGracefully()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 }

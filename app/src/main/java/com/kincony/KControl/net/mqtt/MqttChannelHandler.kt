@@ -81,7 +81,9 @@ class MqttChannelHandler(
         LogUtils.d("MQTT[${client.clientId}] channelUnregistered")
         super.channelUnregistered(ctx)
         client.disconnect()
-        client.connect(client.reconnectCallback!!)
+        if (client.needReconnect) {
+            client.connect(client.reconnectCallback!!)
+        }
     }
 
     override fun channelRegistered(ctx: ChannelHandlerContext?) {
@@ -98,7 +100,9 @@ class MqttChannelHandler(
         LogUtils.d("MQTT[${client.clientId}] exceptionCaught ${cause}")
         super.exceptionCaught(ctx, cause)
         client.disconnect()
-        client.connect(client.reconnectCallback!!)
+        if (client.needReconnect) {
+            client.connect(client.reconnectCallback!!)
+        }
     }
 
     private fun handlePublish(channel: Channel, message: MqttPublishMessage) {
@@ -123,6 +127,7 @@ class MqttChannelHandler(
             MqttConnectReturnCode.CONNECTION_ACCEPTED -> {
                 LogUtils.d("MQTT[${client.clientId}] CONNACK CONNECTION_ACCEPTED")
                 connectCallback.onSuccess(client)
+                client.needReconnect = true
             }
             MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD,
             MqttConnectReturnCode.CONNECTION_REFUSED_IDENTIFIER_REJECTED,

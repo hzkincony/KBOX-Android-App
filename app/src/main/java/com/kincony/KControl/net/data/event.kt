@@ -1,6 +1,6 @@
 package com.kincony.KControl.net.data
 
-class RefreshAddressEvent()
+class RefreshAddressEvent(val address: IPAddress?)
 class RefreshSceneEvent()
 
 class DeviceChange(

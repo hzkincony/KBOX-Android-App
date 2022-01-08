@@ -75,7 +75,7 @@ class SettingFragment : BaseFragment() {
                         SPUtils.setTemperatureUnit("℉")
                         tv_temperature_unit.setText("℉")
                     }
-                    EventBus.getDefault().post(RefreshAddressEvent())
+                    EventBus.getDefault().post(RefreshAddressEvent(null))
                 }
                 .setNegativeButton(R.string.cancel, null)
                 .create()
@@ -193,7 +193,7 @@ class SettingFragment : BaseFragment() {
                     .show()
             }
 
-            EventBus.getDefault().post(RefreshAddressEvent())
+            EventBus.getDefault().post(RefreshAddressEvent(null))
             EventBus.getDefault().post(RefreshSceneEvent())
         }
         super.onActivityResult(requestCode, resultCode, data)

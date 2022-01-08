@@ -233,6 +233,9 @@ class HomeFragment : BaseFragment() {
 
     @Subscribe
     public fun refreshDevice(event: RefreshAddressEvent) {
+        if (event.address != null && ProtocolType.MQTT.value == event.address.protocolType) {
+            MqttClientManager.disconnect(event.address)
+        }
         loadDevice()
     }
 
@@ -406,7 +409,7 @@ class HomeFragment : BaseFragment() {
                 itemName = getInPutState(0)
             }
             DeviceType.Relay_4.value -> {
-                itemName = getInPutState(8)
+                itemName = getInPutState(4)
             }
             DeviceType.Relay_8.value -> {
                 itemName = getInPutState(8)

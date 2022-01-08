@@ -13,6 +13,14 @@ object MqttClientManager {
     val mainThread = Handler(Looper.getMainLooper())
     val mqttClientMap: HashMap<IPAddress, MqttClient> = HashMap()
 
+    fun disconnect(ipAddress: IPAddress) {
+        val client = mqttClientMap.get(ipAddress)
+        if (client != null) {
+            client.disconnect()
+            mqttClientMap.remove(ipAddress)?.close()
+        }
+    }
+
     fun connect(ipAddress: IPAddress, callback: MqttConnectCallback?) {
         val client = mqttClientMap.get(ipAddress)
         if (client != null && (client.state == MqttClient.CONNECTED || client.state == MqttClient.CONNECTING)) {
@@ -40,7 +48,7 @@ object MqttClientManager {
                 }
 
                 override fun onFail(msg: String) {
-                    mqttClientMap.remove(ipAddress)
+                    mqttClientMap.remove(ipAddress)?.close()
                     if (callback != null) {
                         mainThread.post {
                             callback.onFail(msg)

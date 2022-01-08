@@ -114,7 +114,7 @@ class AddressActivity : BaseActivity() {
 
         list.remove(address)
         adapter.notifyDataSetChanged()
-        EventBus.getDefault().post(RefreshAddressEvent())
+        EventBus.getDefault().post(RefreshAddressEvent(address))
         EventBus.getDefault().post(RefreshSceneEvent())
     }
 

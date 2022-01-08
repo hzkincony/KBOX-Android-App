@@ -17,6 +17,8 @@ object LogUtils {
 
     var isFirstWriteFile = true
 
+    var logFile = File(App.application.getExternalFilesDir(""), "log")
+
     fun d(vararg msgArray: String) {
         log(Log.DEBUG, TAG, *msgArray)
     }
@@ -32,7 +34,6 @@ object LogUtils {
             }
         }
         if (FILE) {
-            val logFile = File(App.application.getExternalFilesDir(""), "log")
             if (!logFile.exists()) {
                 logFile.createNewFile()
             }
