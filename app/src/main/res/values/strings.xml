@@ -91,7 +91,7 @@
     <string name="scan_qr_code_from_wrong">Not support this QR code</string>
     <string name="scan_qr_code_from_album_wrong">Can\'t fine QR code</string>
     <string name="load_address">Restore the original phone</string>
-    <string name="share_address">Sharing configuration</string>
+    <string name="share_address">Share</string>
     <string name="change_temperature_unit">Switch temperature unit</string>
     <string name="change_temperature_unit_to">Switch temperature to：</string>
 
@@ -112,5 +112,9 @@
     <string name="label_max">Max:</string>
     <string name="label_min">Min:</string>
     <string name="label_unit">Unit:</string>
+
+    <string name="save">save</string>
+    <string name="save_success">save success</string>
+    <string name="save_fail">save fail</string>
 
 </resources>

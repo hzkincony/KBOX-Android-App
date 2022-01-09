@@ -51,10 +51,10 @@ class DeviceInPutEditActivity : BaseActivity() {
         val iId = intent.getIntExtra("id", 0)
         val sName = intent.getStringExtra("name")
         iIcon = intent.getIntExtra("icon", R.drawable.icon6)
-        max = intent.getStringExtra("max")
-        min = intent.getStringExtra("min")
-        unit = intent.getStringExtra("unit")
-        val sItemName = intent.getStringExtra("itemName")
+        max = intent.getStringExtra("max") ?: ""
+        min = intent.getStringExtra("min") ?: ""
+        unit = intent.getStringExtra("unit") ?: ""
+        val sItemName = intent.getStringExtra("itemName") ?: ""
 
         ImageLoader.load(this, iIcon, icon)
         name.setText(sName)

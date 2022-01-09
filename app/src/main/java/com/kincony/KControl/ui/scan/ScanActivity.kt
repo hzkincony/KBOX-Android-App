@@ -128,15 +128,13 @@ class ScanActivity : BaseActivity(), SurfaceHolder.Callback {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    override fun surfaceChanged(holder: SurfaceHolder?, format: Int, width: Int, height: Int) {
-
+    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
     }
 
-    override fun surfaceDestroyed(holder: SurfaceHolder?) {
-
+    override fun surfaceDestroyed(holder: SurfaceHolder) {
     }
 
-    override fun surfaceCreated(holder: SurfaceHolder?) {
+    override fun surfaceCreated(holder: SurfaceHolder) {
         cameraHandler?.post(openRunnable)
     }
 
@@ -370,5 +368,6 @@ class ScanActivity : BaseActivity(), SurfaceHolder.Callback {
         cameraHandler?.removeCallbacksAndMessages(null)
         cameraThread?.quit()
     }
+
 
 }

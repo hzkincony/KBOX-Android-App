@@ -130,6 +130,19 @@ class RelayDeviceConvert(adapter: DeviceAdapter) : AbsBaseDeviceConvert(adapter)
                         baseViewHolder.getView<View>(R.id.status1_6).visibility = View.INVISIBLE
                         baseViewHolder.getView<View>(R.id.status1_7).visibility = View.INVISIBLE
                         baseViewHolder.getView<View>(R.id.status1_8).visibility = View.INVISIBLE
+                    } else if (itemName.size == 4) {
+                        baseViewHolder.getView<View>(R.id.status1_1).visibility = View.VISIBLE
+                        baseViewHolder.getView<View>(R.id.status1_2).visibility = View.VISIBLE
+                        baseViewHolder.getView<View>(R.id.status1_3).visibility = View.VISIBLE
+                        baseViewHolder.getView<View>(R.id.status1_4).visibility = View.VISIBLE
+                        baseViewHolder.getView<View>(R.id.status1_5).visibility = View.INVISIBLE
+                        baseViewHolder.getView<View>(R.id.status1_6).visibility = View.INVISIBLE
+                        baseViewHolder.getView<View>(R.id.status1_7).visibility = View.INVISIBLE
+                        baseViewHolder.getView<View>(R.id.status1_8).visibility = View.INVISIBLE
+                        baseViewHolder.setText(R.id.text1_1, itemName.get(0))
+                        baseViewHolder.setText(R.id.text1_2, itemName.get(1))
+                        baseViewHolder.setText(R.id.text1_3, itemName.get(2))
+                        baseViewHolder.setText(R.id.text1_4, itemName.get(3))
                     } else if (itemName.size == 6) {
                         baseViewHolder.getView<View>(R.id.status1_1).visibility = View.VISIBLE
                         baseViewHolder.getView<View>(R.id.status1_2).visibility = View.VISIBLE

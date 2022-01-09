@@ -1,13 +1,21 @@
 package com.kincony.KControl.ui
 
+import android.Manifest
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
@@ -24,6 +32,10 @@ import com.kincony.KControl.utils.ToastUtils
 import com.kincony.KControl.utils.Tools
 import kotlinx.android.synthetic.main.activity_address.*
 import org.greenrobot.eventbus.EventBus
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -96,11 +108,172 @@ class AddressActivity : BaseActivity() {
                 .setCancelable(true)
                 .setView(view)
                 .setPositiveButton(resources.getString(R.string.confirm), null)
+                .setNegativeButton(resources.getString(R.string.save)) { dialog, _ ->
+                    val saveBitmap =
+                        createQRCodeBitmap(
+                            content,
+                            480,
+                            480,
+                            "UTF-8",
+                            "L",
+                            "10",
+                            Color.BLACK,
+                            Color.WHITE
+                        )
+                    if (saveBitmap == null) {
+                        ToastUtils.showToastLong(getString(R.string.save_fail))
+                        return@setNegativeButton
+                    }
+                    save2Album(saveBitmap, "KBOX_QRCode_${System.currentTimeMillis()}.png")
+                }
                 .create()
                 .show()
         } else {
             ToastUtils.showToastLong(getString(R.string.scan_qr_code_create_wrong))
         }
+    }
+
+    private fun save2Album(saveBitmap: Bitmap, saveName: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+//            val insertImage = MediaStore.Images.Media.insertImage(
+//                contentResolver,
+//                saveBitmap,
+//                saveName,
+//                saveName
+//            )
+//            if (TextUtils.isEmpty(insertImage)) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ContextCompat.checkSelfPermission(
+                        this@AddressActivity,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    val saveDir = File(
+                        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+                        "KBOX"
+                    )
+                    if (!saveDir.exists()) {
+                        saveDir.mkdir()
+                    }
+                    val saveFile = File(saveDir, saveName)
+                    var os: OutputStream? = null
+                    try {
+                        os = BufferedOutputStream(FileOutputStream(saveFile))
+                        val compressResult = saveBitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
+                        if (compressResult) {
+                            try {
+                                val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                                intent.data = Uri.fromFile(saveFile)
+                                sendBroadcast(intent)
+                                val intent2 = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                                intent2.data = Uri.parse("file://" + saveFile.getAbsolutePath())
+                                sendBroadcast(intent2)
+                            } catch (e: Exception) {
+                                val intent3 = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                                intent3.data = Uri.parse("file://" + saveFile.getAbsolutePath())
+                                sendBroadcast(intent3)
+                            }
+                            showSaveSuccess(saveFile.path)
+                        } else {
+                            ToastUtils.showToastLong(getString(R.string.save_fail))
+                        }
+                    } catch (e: Exception) {
+                        ToastUtils.showToastLong(getString(R.string.save_fail))
+                    } finally {
+                        Tools.close(os)
+                    }
+                } else {
+                    requestPermissions(
+                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                        1000
+                    )
+                }
+            } else {
+                val saveDir = File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
+                    "KBOX"
+                )
+                if (!saveDir.exists()) {
+                    saveDir.mkdir()
+                }
+                val saveFile = File(saveDir, saveName)
+                var os: OutputStream? = null
+                try {
+                    os = BufferedOutputStream(FileOutputStream(saveFile))
+                    val compressResult = saveBitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
+                    if (compressResult) {
+                        try {
+                            val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                            intent.data = Uri.fromFile(saveFile)
+                            sendBroadcast(intent)
+                        } catch (e: Exception) {
+                            val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                            intent.data = Uri.parse("file://" + saveFile.getAbsolutePath())
+                            sendBroadcast(intent)
+                        }
+                        showSaveSuccess(saveFile.path)
+                    } else {
+                        ToastUtils.showToastLong(getString(R.string.save_fail))
+                    }
+                } catch (e: Exception) {
+                    ToastUtils.showToastLong(getString(R.string.save_fail))
+                } finally {
+                    Tools.close(os)
+                }
+            }
+//            } else {
+//                ToastUtils.showToastLong(getString(R.string.save_success))
+//            }
+        } else {
+            val contentValues = ContentValues()
+            contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, saveName)
+            contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/*")
+            val contentUri: Uri
+            contentUri = if (Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED) {
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+            } else {
+                MediaStore.Images.Media.INTERNAL_CONTENT_URI
+            }
+            contentValues.put(
+                MediaStore.Images.Media.RELATIVE_PATH,
+                Environment.DIRECTORY_DCIM + File.separator + "KBOX"
+            )
+            contentValues.put(MediaStore.MediaColumns.IS_PENDING, 1)
+            val insertUri = contentResolver.insert(contentUri, contentValues)
+            if (insertUri == null) {
+                ToastUtils.showToastLong(getString(R.string.save_fail))
+                return
+            }
+            var os: OutputStream? = null
+            try {
+                os = contentResolver.openOutputStream(insertUri)
+                val compressResult = saveBitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
+                if (compressResult) {
+                    contentValues.clear()
+                    contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0)
+                    contentResolver.update(insertUri, contentValues, null, null)
+                    ToastUtils.showToastLong(getString(R.string.save_success))
+                } else {
+                    contentResolver.delete(insertUri, null, null)
+                    ToastUtils.showToastLong(getString(R.string.save_fail))
+                }
+            } catch (e: Exception) {
+                contentResolver.delete(insertUri, null, null)
+                ToastUtils.showToastLong(getString(R.string.save_fail))
+            } finally {
+                Tools.close(os)
+            }
+        }
+    }
+
+    private fun showSaveSuccess(absolutePath: String) {
+        AlertDialog.Builder(this@AddressActivity)
+            .setTitle(R.string.save_success)
+            .setMessage(absolutePath)
+            .setCancelable(true)
+            .setPositiveButton(resources.getString(R.string.confirm), null)
+            .create()
+            .show()
     }
 
     private fun deleteAddress(address: IPAddress) {
