@@ -16,7 +16,7 @@ class KDimmerReadOneDimmerUseCase {
      * @param callback 回调
      */
     fun execute(address: IPAddress, number: Int, callback: Callback) {
-        if (address.type != DeviceType.Dimmer_8.value) throw IllegalArgumentException("设备类型不为：${DeviceType.Dimmer_8.value}(路调光器)")
+        if (address.deviceType != DeviceType.Dimmer_8.value) throw IllegalArgumentException("设备类型不为：${DeviceType.Dimmer_8.value}(路调光器)")
         val request = Request.obtain(address.ip, address.port, KDimmerCommand.readDimmer(number))
         Client.newCall(request).enqueue(callback)
     }

@@ -9,6 +9,6 @@ class UnknownDeviceConvert(adapter: DeviceAdapter) : AbsBaseDeviceConvert(adapte
 
     override fun convert(baseViewHolder: BaseViewHolder, device: Device) {
         val unknownDeviceTip = adapter.mContext.getString(R.string.unknown_device)
-        baseViewHolder.setText(R.id.tv_unknown, "${device.name} ${unknownDeviceTip}")
+        baseViewHolder.setText(R.id.tv_unknown, "${device.name} ${unknownDeviceTip} ${device.state}")
     }
 }

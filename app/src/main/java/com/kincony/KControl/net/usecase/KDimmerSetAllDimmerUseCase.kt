@@ -16,7 +16,7 @@ class KDimmerSetAllDimmerUseCase {
      * @param callback 回调
      */
     fun execute(address: IPAddress, brightnessList: List<String>, callback: Callback) {
-        if (address.type != DeviceType.Dimmer_8.value) throw IllegalArgumentException("设备类型不为：${DeviceType.Dimmer_8.value}(路调光器)")
+        if (address.deviceType != DeviceType.Dimmer_8.value) throw IllegalArgumentException("设备类型不为：${DeviceType.Dimmer_8.value}(路调光器)")
 
         val request =
             Request.obtain(

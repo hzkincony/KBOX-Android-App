@@ -4,18 +4,19 @@ import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import com.kincony.KControl.App
-import com.kincony.KControl.BuildConfig
 import java.io.File
 import java.util.*
 
 object LogUtils {
     val TAG: String = "LM"
 
-    var DEBUG: Boolean = BuildConfig.DEBUG
+    var DEBUG: Boolean = false
 
-    var FILE: Boolean = BuildConfig.DEBUG
+    var FILE: Boolean = false
 
     var isFirstWriteFile = true
+
+    var logFile = File(App.application.externalCacheDir, "log.txt")
 
     fun d(vararg msgArray: String) {
         log(Log.DEBUG, TAG, *msgArray)
@@ -32,7 +33,6 @@ object LogUtils {
             }
         }
         if (FILE) {
-            val logFile = File(App.application.getExternalFilesDir(""), "log")
             if (!logFile.exists()) {
                 logFile.createNewFile()
             }

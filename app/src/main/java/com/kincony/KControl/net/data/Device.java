@@ -17,10 +17,13 @@ import static androidx.room.ForeignKey.CASCADE;
  */
 @Entity(
         tableName = "device",
-        foreignKeys = @ForeignKey(entity = IPAddress.class,
+        foreignKeys = @ForeignKey(
+                entity = IPAddress.class,
                 parentColumns = "id",
                 childColumns = "address_id",
-                onDelete = CASCADE))
+                onDelete = CASCADE
+        )
+)
 public class Device implements MultiItemEntity {
     /**
      * ip地址id
@@ -99,6 +102,21 @@ public class Device implements MultiItemEntity {
      */
     public String state;
 
+    /**
+     * 最大值
+     */
+    public String max;
+
+    /**
+     * 最小值
+     */
+    public String min;
+
+    /**
+     * 单位
+     */
+    public String unit;
+
     public Device() {
     }
 
@@ -129,6 +147,6 @@ public class Device implements MultiItemEntity {
 
     @Override
     public int getItemType() {
-        return address == null ? DeviceType.Unknown.getValue() : address.getType();
+        return address == null ? DeviceType.Unknown.getValue() : address.getDeviceType();
     }
 }

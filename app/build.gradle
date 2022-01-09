@@ -51,7 +51,7 @@ android {
     }
 
     packagingOptions {
-        exclude 'META-INF/proguard/androidx-annotations.pro'
+        exclude 'META-INF/*'
     }
 
     lintOptions {
@@ -73,20 +73,15 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
-    implementation 'androidx.core:core-ktx:1.2.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+    implementation 'androidx.core:core-ktx:1.3.2'
     implementation "androidx.recyclerview:recyclerview:1.1.0"
-    implementation "androidx.recyclerview:recyclerview-selection:1.1.0-rc01"
-
-//    implementation "com.android.support:appcompat-v7:$supportVersion"
-//    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
-//    implementation "com.android.support:design:$supportVersion"
+    implementation "androidx.recyclerview:recyclerview-selection:1.1.0-rc03"
 
     implementation "com.squareup.okio:okio:2.5.0"
-    //上拉加载adapter
-//    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.30'
+
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:3.0.2'
 
     // 图片加载
@@ -95,16 +90,22 @@ dependencies {
     // EventBus
     implementation 'org.greenrobot:eventbus:3.1.1'
 
-//    implementation 'com.tencent.bugly:crashreport_upgrade:latest.release'
-
     //lifecycle
-    def lifecycle_version = '2.2.0'
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
-    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.2.0"
 
-    def room_version = "2.2.3"
-    implementation "androidx.room:room-runtime:$room_version"
-    kapt "androidx.room:room-compiler:$room_version"
-    // For Kotlin use kapt instead of annotationProcessor
+    //room
+    implementation "androidx.room:room-runtime:2.2.5"
+    kapt "androidx.room:room-compiler:2.2.5"
 
+    //netty
+    implementation 'io.netty:netty-all:4.1.72.Final'
+
+    //zxing
+    implementation 'com.google.zxing:core:3.3.3'
+
+    //gson
+    implementation 'com.google.code.gson:gson:2.8.4'
+
+    testImplementation 'junit:junit:4.12'
 }

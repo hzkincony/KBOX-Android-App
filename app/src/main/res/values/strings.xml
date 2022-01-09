@@ -10,7 +10,7 @@
     <string name="device">Device</string>
     <string name="edit">Edit</string>
     <string name="setting">Setting</string>
-    <string name="pic">Device Pic</string>
+    <string name="pic">Device ICO</string>
 
     <string name="scene">Scene Mode</string>
     <string name="scene_edit">Edit Scene Mode</string>
@@ -41,29 +41,33 @@
     <string name="again">Press again to exit.</string>
 
     <string name="name_not_empty">Name can\'t be empty!</string>
+    <string name="max_not_empty">Max can\'t be empty!</string>
+    <string name="max_not_zero">Max can\'t be zero!</string>
+    <string name="min_not_empty">Min can\'t be empty!</string>
+    <string name="unit_not_empty">Unit can\'t be empty!</string>
 
     <string name="cancel">Cancel</string>
     <string name="confirm">OK</string>
     <string name="complete">Save</string>
 
     <string name="Message">Message</string>
-    <string name="message_delete">Are you sure you want to delete?</string>
-    <string name="message_delete_scene">Are you sure you want to delete?</string>
+    <string name="message_delete">Are you sure  want to delete?</string>
+    <string name="message_delete_scene">Are you sure want to delete?</string>
 
-    <string name="add_already">The device has been added.</string>
+    <string name="add_already">The device has been added already.</string>
 
 
     <string name="ip_input">Please enter IP address.</string>
     <string name="port_input">Please enter PORT.</string>
 
     <string name="ip_alert">Please enter a valid IP address.</string>
-    <string name="port_alert">Please enter a valid PORT address.</string>
+    <string name="port_alert">Please enter a valid PORT.</string>
     <string name="address_alert">Please enter a valid address.</string>
     <string name="device_alert">Please add device.</string>
 
     <string name="connect_fail">Connect fail</string>
-    <string name="ui_fail">UI thread cannot send data.</string>
-    <string name="ui_fail2">UI thread cannot establish connection.</string>
+    <string name="ui_fail">UI thread can not send data.</string>
+    <string name="ui_fail2">UI thread can not establish connection.</string>
 
 
     <string name="add_device">Add Device</string>
@@ -77,5 +81,40 @@
 
     <string name="unknown_device">Unknown Device</string>
     <string name="data_exception_tips">Data exception, start data synchronization</string>
+    <string name="device_id_input">Please enter device id</string>
+    <string name="user_name_input">Please enter user name</string>
+    <string name="password_input">Please enter password</string>
+
+    <string name="album">Album</string>
+    <string name="scan_qr_code_warn">Scan QR code</string>
+    <string name="scan_qr_code_create_wrong">QR code create failed</string>
+    <string name="scan_qr_code_from_wrong">Not support this QR code</string>
+    <string name="scan_qr_code_from_album_wrong">Can\'t fine QR code</string>
+    <string name="load_address">Restore the original phone</string>
+    <string name="share_address">Share</string>
+    <string name="change_temperature_unit">Switch temperature unit</string>
+    <string name="change_temperature_unit_to">Switch temperature to：</string>
+
+    <string name="ignoring_battery_optimizations">Ignoring Battery Optimizations</string>
+    <string name="ignoring_battery_optimizations_fail">Ignoring Battery Optimizations Fail</string>
+    <string name="boot_start_management">Boot Start Management</string>
+    <string name="history">History</string>
+    <string name="label_address">Address:</string>
+    <string name="label_ip">IP:</string>
+    <string name="label_port">PORT:</string>
+    <string name="label_model">Model:</string>
+    <string name="label_protocol">Protocol:</string>
+    <string name="label_device_id">Device ID:</string>
+    <string name="label_topic_password">Device Pwd:</string>
+    <string name="label_user_name">MQTT User:</string>
+    <string name="label_password">MQTT Pwd:</string>
+
+    <string name="label_max">Max:</string>
+    <string name="label_min">Min:</string>
+    <string name="label_unit">Unit:</string>
+
+    <string name="save">save</string>
+    <string name="save_success">save success</string>
+    <string name="save_fail">save fail</string>
 
 </resources>

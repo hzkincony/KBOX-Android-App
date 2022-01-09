@@ -21,14 +21,14 @@
     <string name="name">名称</string>
 
     <string name="InPutName">输入端口</string>
-    <string name="InPutName1">输入端口1</string>
-    <string name="InPutName2">输入端口2</string>
-    <string name="InPutName3">输入端口3</string>
-    <string name="InPutName4">输入端口4</string>
-    <string name="InPutName5">输入端口5</string>
-    <string name="InPutName6">输入端口6</string>
-    <string name="InPutName7">输入端口7</string>
-    <string name="InPutName8">输入端口8</string>
+    <string name="InPutName1">端口1</string>
+    <string name="InPutName2">端口2</string>
+    <string name="InPutName3">端口3</string>
+    <string name="InPutName4">端口4</string>
+    <string name="InPutName5">端口5</string>
+    <string name="InPutName6">端口6</string>
+    <string name="InPutName7">端口7</string>
+    <string name="InPutName8">端口8</string>
 
     <string name="Icon">图标</string>
     <string name="icon">图标</string>
@@ -40,6 +40,10 @@
     <string name="again">再按一次退出.</string>
 
     <string name="name_not_empty">名称不能为空!</string>
+    <string name="max_not_empty">最大值不能为空!</string>
+    <string name="max_not_zero">最大值不能为0!</string>
+    <string name="min_not_empty">最小值不能为空!</string>
+    <string name="unit_not_empty">单位不能为空!</string>
 
     <string name="cancel">取消</string>
     <string name="confirm">确认</string>
@@ -73,5 +77,40 @@
 
     <string name="unknown_device">未知设备</string>
     <string name="data_exception_tips">数据异常，开始同步数据！</string>
+    <string name="device_id_input">请输入设备ID.</string>
+    <string name="user_name_input">请输入用户名.</string>
+    <string name="password_input">请输入密码.</string>
+
+    <string name="album">相册</string>
+    <string name="scan_qr_code_warn">放入框内，自动扫描</string>
+    <string name="scan_qr_code_create_wrong">二维码创建失败</string>
+    <string name="scan_qr_code_from_wrong">不支持的二维码</string>
+    <string name="scan_qr_code_from_album_wrong">没有找到二维码</string>
+    <string name="load_address">从源手机还原配置</string>
+    <string name="share_address">分享配置</string>
+    <string name="change_temperature_unit">切换温度单位</string>
+    <string name="change_temperature_unit_to">切换温度单位为：</string>
+
+    <string name="ignoring_battery_optimizations">忽略电池优化</string>
+    <string name="ignoring_battery_optimizations_fail">忽略电池优化失败</string>
+    <string name="boot_start_management">后台启动管理</string>
+    <string name="history">历史</string>
+    <string name="label_address">地址:</string>
+    <string name="label_ip">IP地址:</string>
+    <string name="label_port">端口:</string>
+    <string name="label_model">设备类型:</string>
+    <string name="label_protocol">协议类型:</string>
+    <string name="label_device_id">设备ID:</string>
+    <string name="label_topic_password">设备密码:</string>
+    <string name="label_user_name">MQTT账号:</string>
+    <string name="label_password">MQTT密码:</string>
+
+    <string name="label_max">最大:</string>
+    <string name="label_min">最小:</string>
+    <string name="label_unit">单位:</string>
+
+    <string name="save">保存</string>
+    <string name="save_success">保存成功</string>
+    <string name="save_fail">保存失败</string>
 
 </resources>

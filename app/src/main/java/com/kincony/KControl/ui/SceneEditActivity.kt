@@ -128,10 +128,10 @@ class SceneEditActivity : BaseActivity() {
                     val deviceChannelList = list.subList(start, start + length)
                     start += length
                     if (TextUtils.isEmpty(result)) {
-                        result = actionCode(deviceChannelList, device.address.type)
+                        result = actionCode(deviceChannelList, device.address.deviceType)
                     } else {
                         result =
-                            "${result}_${actionCode(deviceChannelList, device.address.type)}"
+                            "${result}_${actionCode(deviceChannelList, device.address.deviceType)}"
                     }
                 }
                 scene!!.action = result
@@ -175,9 +175,10 @@ class SceneEditActivity : BaseActivity() {
                     val deviceChannelList = list.subList(start, start + length)
                     start += length
                     if (TextUtils.isEmpty(result)) {
-                        result = actionCode(deviceChannelList, device.address.type)
+                        result = actionCode(deviceChannelList, device.address.deviceType)
                     } else {
-                        result = "${result}_${actionCode(deviceChannelList, device.address.type)}"
+                        result =
+                            "${result}_${actionCode(deviceChannelList, device.address.deviceType)}"
                     }
                 }
                 scene!!.action = result
@@ -215,7 +216,7 @@ class SceneEditActivity : BaseActivity() {
             }
             var length = lengths[index].toInt()
             val action = actions[index]
-            when (address.type) {
+            when (address.deviceType) {
                 DeviceType.Relay_2.value,
                 DeviceType.Relay_4.value,
                 DeviceType.Relay_8.value -> {//2,4,8
@@ -413,6 +414,13 @@ class SceneEditActivity : BaseActivity() {
         val view = LayoutInflater.from(this).inflate(R.layout.dialog_scene_add, null)
         val spinner = view.findViewById<AppCompatSpinner>(R.id.device)
         val address = KBoxDatabase.getInstance(this).addressDao.allAddress;
+        val it = address.iterator()
+        while (it.hasNext()) {
+            val next = it.next()
+            if (next.deviceType == DeviceType.COLB.value) {
+                it.remove()
+            }
+        }
         val items = Array<String>(address.size) { i -> address[i].toString() }
         val itemsAdapter =
             ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
@@ -464,7 +472,7 @@ class SceneEditActivity : BaseActivity() {
                 }
             }
 
-            d.isTouch = d.address.type == DeviceType.Dimmer_8.value
+            d.isTouch = d.address.deviceType == DeviceType.Dimmer_8.value
             d.open = false
         }
         list.addAll(devices)
@@ -472,12 +480,12 @@ class SceneEditActivity : BaseActivity() {
         if (scene?.ids.isNullOrEmpty()) {
             scene?.ids = "${address.id}"
             scene?.address = address.toString()
-            scene?.length = "${address.type % 10000}"
+            scene?.length = "${address.getDeviceTypeNumberCount()}"
             scene?.action = getDefaultAction(address)
         } else {
             scene?.ids = "${scene?.ids}_${address.id}"
             scene?.address = "${scene?.address}_${address}"
-            scene?.length = "${scene?.length}_${address.type % 10000}"
+            scene?.length = "${scene?.length}_${address.getDeviceTypeNumberCount()}"
             scene?.action = "${scene?.action}_${getDefaultAction(address)}"
         }
         adapter?.notifyDataSetChanged()
@@ -485,7 +493,7 @@ class SceneEditActivity : BaseActivity() {
 
     private fun getDefaultAction(address: IPAddress): String {
         var result = "0"
-        when (address.type) {
+        when (address.deviceType) {
             DeviceType.Relay_2.value,
             DeviceType.Relay_4.value,
             DeviceType.Relay_8.value -> result = "0"
