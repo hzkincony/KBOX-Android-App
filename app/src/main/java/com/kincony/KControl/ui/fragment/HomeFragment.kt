@@ -1089,7 +1089,7 @@ class HomeFragment : BaseFragment() {
                                     temp.state = json.optJSONObject("T1")?.optString("value") +
                                             "," + json.optJSONObject("T2")?.optString("value") +
                                             "," + json.optJSONObject("T3")?.optString("value") +
-                                            "," + json.optJSONObject("T3")?.optString("value") +
+                                            "," + json.optJSONObject("T4")?.optString("value") +
                                             "," + json.optJSONObject("T5")?.optString("value")
                                 }
                             }
