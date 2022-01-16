@@ -16,7 +16,7 @@ object LogUtils {
 
     var isFirstWriteFile = true
 
-    var logFile = File(App.application.externalCacheDir, "log.txt")
+    var logFile: File? = null;
 
     fun d(vararg msgArray: String) {
         log(Log.DEBUG, TAG, *msgArray)
@@ -33,34 +33,37 @@ object LogUtils {
             }
         }
         if (FILE) {
-            if (!logFile.exists()) {
-                logFile.createNewFile()
+            if (logFile == null) {
+                logFile = File(App.application.externalCacheDir, "log.txt")
             }
-            if (logFile.length() >= 10 * 1024 * 1024) {
-                logFile.writeText("")
+            if (!logFile!!.exists()) {
+                logFile!!.createNewFile()
+            }
+            if (logFile!!.length() >= 10 * 1024 * 1024) {
+                logFile!!.writeText("")
                 isFirstWriteFile = true
             }
-            if (logFile.length() == 0L) {
-                logFile.appendText("LANGUAGE=${Locale.getDefault().language}\n")
-                logFile.appendText("BRAND=${Build.BRAND}\n")
-                logFile.appendText("MANUFACTURER=${Build.MANUFACTURER}\n")
-                logFile.appendText("DEVICE=${Build.DEVICE}\n")
-                logFile.appendText("MODEL=${Build.MODEL}\n")
-                logFile.appendText("VERSION.SDK_INT=${Build.VERSION.SDK_INT}\n")
+            if (logFile!!.length() == 0L) {
+                logFile!!.appendText("LANGUAGE=${Locale.getDefault().language}\n")
+                logFile!!.appendText("BRAND=${Build.BRAND}\n")
+                logFile!!.appendText("MANUFACTURER=${Build.MANUFACTURER}\n")
+                logFile!!.appendText("DEVICE=${Build.DEVICE}\n")
+                logFile!!.appendText("MODEL=${Build.MODEL}\n")
+                logFile!!.appendText("VERSION.SDK_INT=${Build.VERSION.SDK_INT}\n")
 
-                logFile.appendText(
-                    "ANDROID_ID=${Settings.System.getString(
-                        App.application.contentResolver,
-                        Settings.Secure.ANDROID_ID
-                    )}\n"
+                logFile!!.appendText(
+                        "ANDROID_ID=${Settings.System.getString(
+                                App.application.contentResolver,
+                                Settings.Secure.ANDROID_ID
+                        )}\n"
                 )
             }
             if (isFirstWriteFile) {
-                logFile.appendText("==============================================================\n")
+                logFile!!.appendText("==============================================================\n")
                 isFirstWriteFile = false
             }
             for (msg in msgArray) {
-                logFile.appendText("${getPriorityString(priority)}-${System.currentTimeMillis()}:$msg\n")
+                logFile!!.appendText("${getPriorityString(priority)}-${System.currentTimeMillis()}:$msg\n")
             }
         }
     }

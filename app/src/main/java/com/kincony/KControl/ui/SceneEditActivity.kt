@@ -87,10 +87,10 @@ class SceneEditActivity : BaseActivity() {
         }
         model.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View,
-                position: Int,
-                id: Long
+                    parent: AdapterView<*>,
+                    view: View,
+                    position: Int,
+                    id: Long
             ) {
                 when (position) {
                     0 -> {
@@ -131,7 +131,7 @@ class SceneEditActivity : BaseActivity() {
                         result = actionCode(deviceChannelList, device.address.deviceType)
                     } else {
                         result =
-                            "${result}_${actionCode(deviceChannelList, device.address.deviceType)}"
+                                "${result}_${actionCode(deviceChannelList, device.address.deviceType)}"
                     }
                 }
                 scene!!.action = result
@@ -178,7 +178,7 @@ class SceneEditActivity : BaseActivity() {
                         result = actionCode(deviceChannelList, device.address.deviceType)
                     } else {
                         result =
-                            "${result}_${actionCode(deviceChannelList, device.address.deviceType)}"
+                                "${result}_${actionCode(deviceChannelList, device.address.deviceType)}"
                     }
                 }
                 scene!!.action = result
@@ -211,7 +211,13 @@ class SceneEditActivity : BaseActivity() {
         for ((index, i) in ids.withIndex()) {
             val devices = KBoxDatabase.getInstance(this).deviceDao.getDevice(i.toInt())
             val address = KBoxDatabase.getInstance(this).addressDao.getAddress(devices[0].addressId)
-            for (temp in devices) {
+            val iterator = devices.iterator()
+            while (iterator.hasNext()) {
+                val temp = iterator.next()
+                if (temp.type == 1) {
+                    iterator.remove()
+                    break
+                }
                 temp.address = address
             }
             var length = lengths[index].toInt()
@@ -423,7 +429,7 @@ class SceneEditActivity : BaseActivity() {
         }
         val items = Array<String>(address.size) { i -> address[i].toString() }
         val itemsAdapter =
-            ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
+                ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
         spinner.adapter = itemsAdapter
         if (address.size > 0) {
             addressSelected = address[0]
@@ -431,10 +437,10 @@ class SceneEditActivity : BaseActivity() {
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View,
-                position: Int,
-                id: Long
+                    parent: AdapterView<*>,
+                    view: View,
+                    position: Int,
+                    id: Long
             ) {
                 addressSelected = address[position]
             }
@@ -444,17 +450,17 @@ class SceneEditActivity : BaseActivity() {
             }
         }
         val dialog = AlertDialog.Builder(this)
-            .setCancelable(true)
-            .setView(view)
-            .setNegativeButton(resources.getString(R.string.cancel)) { _, _ ->
-                addressSelected = null
-            }
-            .setPositiveButton(resources.getString(R.string.confirm)) { _, _ ->
-                if (addressSelected != null) {
-                    addDevice(addressSelected!!)
+                .setCancelable(true)
+                .setView(view)
+                .setNegativeButton(resources.getString(R.string.cancel)) { _, _ ->
+                    addressSelected = null
                 }
-            }
-            .create()
+                .setPositiveButton(resources.getString(R.string.confirm)) { _, _ ->
+                    if (addressSelected != null) {
+                        addDevice(addressSelected!!)
+                    }
+                }
+                .create()
         dialog.show()
     }
 
@@ -465,16 +471,22 @@ class SceneEditActivity : BaseActivity() {
         }
         val devices = KBoxDatabase.getInstance(this).deviceDao.getDevice(address.id)
         val allAddress = KBoxDatabase.getInstance(this).addressDao.allAddress
-        for (d in devices) {
+        val it = devices.iterator()
+        while (it.hasNext()) {
+            val d = it.next()
+            if (d.type == 1) {
+                it.remove()
+                break
+            }
             for (a in allAddress) {
                 if (a.id == d.addressId) {
                     d.address = a
                 }
             }
-
             d.isTouch = d.address.deviceType == DeviceType.Dimmer_8.value
             d.open = false
         }
+
         list.addAll(devices)
 
         if (scene?.ids.isNullOrEmpty()) {
