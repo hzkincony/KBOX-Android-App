@@ -107,7 +107,7 @@ class ScanActivity : BaseActivity(), SurfaceHolder.Callback {
                                             isAlbum = false
                                             ToastUtils.showToastShort(getString(R.string.scan_qr_code_from_album_wrong))
                                         } else {
-                                            LogUtils.d("ScanActivity album result --> $text")
+                                            com.kincony.KControl.utils.LogUtils.d("ScanActivity album result --> $text")
                                             val result = Intent()
                                             result.putExtra("scan_result", text)
                                             setResult(RESULT_OK, result)
@@ -337,7 +337,7 @@ class ScanActivity : BaseActivity(), SurfaceHolder.Callback {
             false
         )
         scannerView.drawResultBitmap(thumbnailImage)
-        LogUtils.d("ScanActivity scan result --> $scanResult.text")
+        com.kincony.KControl.utils.LogUtils.d("ScanActivity scan result --> $scanResult.text")
         val result = Intent()
         result.putExtra("scan_result", scanResult.text)
         setResult(RESULT_OK, result)

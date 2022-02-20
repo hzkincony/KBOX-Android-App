@@ -51,7 +51,7 @@ class CustomConverterFactory private constructor() : Converter.Factory() {
 
     class CustomRequestConverter(val requestId: String) : Converter<String, String> {
         override fun convert(address: InetSocketAddress?, value: String?): String? {
-            LogUtils.d("Network${address}-->Request [${requestId}]=[${value}]")
+            com.kincony.KControl.utils.LogUtils.d("Network${address}-->Request [${requestId}]=[${value}]")
             return value
         }
     }
@@ -90,7 +90,7 @@ class CustomConverterFactory private constructor() : Converter.Factory() {
      */
     class CustomResponseConverter(val requestId: String) : Converter<String, ResponseBody> {
         override fun convert(address: InetSocketAddress?, valueString: String?): ResponseBody? {
-            LogUtils.d("Network${address}-->Response[${requestId}]=[${valueString}]")
+            com.kincony.KControl.utils.LogUtils.d("Network${address}-->Response[${requestId}]=[${valueString}]")
             var value = valueString?.replace(zero, "")
             var result = value?.split(",")
             if (result == null || result.size <= 1) return null

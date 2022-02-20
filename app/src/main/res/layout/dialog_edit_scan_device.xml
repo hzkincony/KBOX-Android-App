@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:paddingBottom="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:id="@+id/llDeviceId"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:visibility="visible">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/label_device_id"
+                android:textColor="@color/press"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/deviceId"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#eeeeee"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:hint="@string/device_id_input"
+                android:lines="1"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:singleLine="true"
+                android:textSize="14dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llUserName"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/label_device_user"
+                android:textColor="@color/press"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/userName"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#eeeeee"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:hint="@string/user_name_input"
+                android:lines="1"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textSize="14dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llPassword"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/label_device_password"
+                android:textColor="@color/press"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#eeeeee"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:hint="@string/password_input"
+                android:lines="1"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textSize="14dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

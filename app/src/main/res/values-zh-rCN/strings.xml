@@ -8,6 +8,7 @@
 
     <string name="device">设备</string>
     <string name="edit">编辑</string>
+    <string name="edit_device">编辑设备</string>
     <string name="setting">设置</string>
     <string name="pic">设备图标</string>
 
@@ -64,7 +65,10 @@
     <string name="address_alert">地址无效.</string>
     <string name="device_alert">请添加设备.</string>
 
+    <string name="connecting">连接中</string>
     <string name="connect_fail">连接失败</string>
+    <string name="connect_success">连接成功</string>
+    <string name="disconnect">连接断开</string>
     <string name="ui_fail">UI线程不能发送数据.</string>
     <string name="ui_fail2">UI线程不能建立连接.</string>
 
@@ -85,6 +89,12 @@
     <string name="scan_qr_code_warn">放入框内，自动扫描</string>
     <string name="scan_qr_code_create_wrong">二维码创建失败</string>
     <string name="scan_qr_code_from_wrong">不支持的二维码</string>
+    <string name="file_from_wrong">不支持的文件</string>
+    <string name="data_sending">数据发送中</string>
+    <string name="data_error">数据异常</string>
+    <string name="data_loading">数据加载中</string>
+    <string name="data_empty">数据为空</string>
+    <string name="add_data_success">添加数据成功</string>
     <string name="scan_qr_code_from_album_wrong">没有找到二维码</string>
     <string name="load_address">从源手机还原配置</string>
     <string name="share_address">分享配置</string>
@@ -101,9 +111,11 @@
     <string name="label_model">设备类型:</string>
     <string name="label_protocol">协议类型:</string>
     <string name="label_device_id">设备ID:</string>
-    <string name="label_topic_password">设备密码:</string>
+    <string name="label_device_user">设备用户:</string>
+    <string name="label_device_password">设备密码:</string>
     <string name="label_user_name">MQTT账号:</string>
     <string name="label_password">MQTT密码:</string>
+    <string name="label_name">Name:</string>
 
     <string name="label_max">最大:</string>
     <string name="label_min">最小:</string>
@@ -113,4 +125,16 @@
     <string name="save_success">保存成功</string>
     <string name="save_fail">保存失败</string>
 
+    <string name="scan_device">扫描设备</string>
+    <string name="scan_success">扫描成功！</string>
+    <string name="scan_result_null">扫描不到任何设备！</string>
+
+    <string name="low">低</string>
+    <string name="middle">中</string>
+    <string name="high">高</string>
+    <string name="scan_qr_code_tips">请将设备连接同一局域网内再进行扫码</string>
+
+    <string name="qr_code">二维码</string>
+    <string name="file">文件</string>
+    <string name="the_file_is_too_large">文件太大，内存不足</string>
 </resources>

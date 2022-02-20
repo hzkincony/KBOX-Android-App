@@ -24,7 +24,9 @@ class IPAddress {
 
     var deviceId: String? = null
 
-    var devicePassword:String? = null
+    var deviceUserName: String? = null
+
+    var devicePassword: String? = null
 
     fun getDeviceTypeNumberCount(): Int {
         return Tools.getDeviceTypeEnum(deviceType).numberCount
@@ -49,6 +51,7 @@ class IPAddress {
         username: String?,
         password: String?,
         deviceId: String?,
+        deviceUserName: String?,
         devicePassword: String?
     ) {
         this.ip = ip
@@ -58,15 +61,26 @@ class IPAddress {
         this.username = username
         this.password = password
         this.deviceId = deviceId
+        this.deviceUserName = deviceUserName
         this.devicePassword = devicePassword
     }
 
     override fun equals(other: Any?): Boolean {
         return if (other is IPAddress && protocolType == other.protocolType) {
-            if (protocolType == ProtocolType.MQTT.value) {
-                other.ip == ip && other.port == port && other.deviceType == deviceType && other.protocolType == protocolType && username != null && password != null && password != null && other.username == username && other.password == password && other.deviceId == deviceId
+            if (protocolType == ProtocolType.CAMERA.value) {
+                other.deviceType == deviceType
+                        && deviceUserName != null && devicePassword != null
+                        && other.deviceUserName == deviceUserName && other.devicePassword == devicePassword
+                        && other.deviceId == deviceId
+            } else if (protocolType == ProtocolType.MQTT.value) {
+                other.ip == ip && other.port == port
+                        && other.deviceType == deviceType
+                        && username != null && password != null
+                        && other.username == username && other.password == password
+                        && other.deviceId == deviceId && other.devicePassword == devicePassword
             } else {
-                other.ip == ip && other.port == port && other.deviceType == deviceType && other.protocolType == protocolType
+                other.ip == ip && other.port == port
+                        && other.deviceType == deviceType
             }
         } else {
             false
@@ -75,12 +89,13 @@ class IPAddress {
 
     override fun hashCode(): Int {
         var result = id
-        if (protocolType == ProtocolType.MQTT.value) {
-            result = 31 * result + ip.hashCode()
-            result = 31 * result + port
+        if (protocolType == ProtocolType.CAMERA.value) {
             result = 31 * result + deviceType
             result = 31 * result + protocolType
-        } else {
+            result = 31 * result + (deviceUserName?.hashCode() ?: 0)
+            result = 31 * result + (devicePassword?.hashCode() ?: 0)
+            result = 31 * result + (deviceId?.hashCode() ?: 0)
+        } else if (protocolType == ProtocolType.MQTT.value) {
             result = 31 * result + ip.hashCode()
             result = 31 * result + port
             result = 31 * result + deviceType
@@ -88,12 +103,20 @@ class IPAddress {
             result = 31 * result + (username?.hashCode() ?: 0)
             result = 31 * result + (password?.hashCode() ?: 0)
             result = 31 * result + (deviceId?.hashCode() ?: 0)
+            result = 31 * result + (devicePassword?.hashCode() ?: 0)
+        } else {
+            result = 31 * result + ip.hashCode()
+            result = 31 * result + port
+            result = 31 * result + deviceType
+            result = 31 * result + protocolType
         }
         return result
     }
 
     override fun toString(): String {
-        return if (protocolType == ProtocolType.MQTT.value) {
+        return if (protocolType == ProtocolType.CAMERA.value) {
+            "camera:${deviceId}:${deviceType}"
+        } else if (protocolType == ProtocolType.MQTT.value) {
             "mqtt:${ip}:${port}:${deviceId}:${deviceType}"
         } else {
             "tcp:${ip}:${port}:${deviceType}"

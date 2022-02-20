@@ -39,6 +39,8 @@ class AddHistoryActivity : BaseActivity() {
             jsonObject.put("userName", address.username)
             jsonObject.put("password", address.password)
             jsonObject.put("deviceId", address.deviceId)
+            jsonObject.put("deviceUserName", address.deviceUserName)
+            jsonObject.put("devicePassword", address.devicePassword)
 
             val result = Intent()
             result.putExtra("history_result", jsonObject.toString())

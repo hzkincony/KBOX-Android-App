@@ -27,7 +27,7 @@ class Request {
                         }
                     }
                 } catch (e: Exception) {
-                    LogUtils.e("Network/${ip}:${port}-->ip address error")
+                    com.kincony.KControl.utils.LogUtils.e("Network/${ip}:${port}-->ip address error")
                     throw e
                 }
                 addressOrNull = InetSocketAddress(host, port)

@@ -108,7 +108,7 @@ class MqttClient(
             val next = iterator.next()
             val publishMessage =
                 MqttMessageHelper.publishMessage(next.topic, next.message, getMessageId())
-            LogUtils.d("MQTT[${clientId}] SEND_PUB ${next.topic} ${next.message}")
+            com.kincony.KControl.utils.LogUtils.d("MQTT[${clientId}] SEND_PUB ${next.topic} ${next.message}")
             channel?.writeAndFlush(publishMessage)
             iterator.remove()
         }
@@ -117,7 +117,7 @@ class MqttClient(
     fun publish(topic: String, message: String, ignore: Boolean = false) {
         if (state == CONNECTED && isSubACK) {
             val publishMessage = MqttMessageHelper.publishMessage(topic, message, getMessageId())
-            LogUtils.d("MQTT[${clientId}] SEND_PUB ${topic} ${message}")
+            com.kincony.KControl.utils.LogUtils.d("MQTT[${clientId}] SEND_PUB ${topic} ${message}")
             channel?.writeAndFlush(publishMessage)
         } else {
             publishEventList.add(MqttPublishEvent(topic, message))
@@ -138,7 +138,7 @@ class MqttClient(
         subscribeEventList.add(MqttSubscribeEvent(topic, callback))
         if (state == CONNECTED) {
             val subscribeMessage = MqttMessageHelper.subscribeMessage(topic, getMessageId())
-            LogUtils.d("MQTT[${clientId}] SEND_SUB ${topic} ")
+            com.kincony.KControl.utils.LogUtils.d("MQTT[${clientId}] SEND_SUB ${topic} ")
             channel?.writeAndFlush(subscribeMessage)
         }
     }

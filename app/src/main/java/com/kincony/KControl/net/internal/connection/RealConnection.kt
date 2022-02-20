@@ -42,9 +42,9 @@ class RealConnection() {
         task = executor.schedule({
             try {
                 rawSocket?.close()
-                LogUtils.d("Network${call?.request?.toAddress}-->Close socket success")
+                com.kincony.KControl.utils.LogUtils.d("Network${call?.request?.toAddress}-->Close socket success")
             } catch (t: Throwable) {
-                LogUtils.e("Network/${call?.request?.ip}:${call?.request?.port}-->Failed to close socket")
+                com.kincony.KControl.utils.LogUtils.e("Network/${call?.request?.ip}:${call?.request?.port}-->Failed to close socket")
             }
             call?.request?.clearUse()
             call?.request?.recycle()
@@ -63,7 +63,7 @@ class RealConnection() {
         val rawSocket = SocketFactory.getDefault().createSocket()!!
         this.rawSocket = rawSocket
         val address = call.request!!.toAddress
-        LogUtils.d("Network${address}-->start connect to address")
+        com.kincony.KControl.utils.LogUtils.d("Network${address}-->start connect to address")
         connectSocket(
             rawSocket, address,
             CONNECT_TIME_OUT

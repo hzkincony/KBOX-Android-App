@@ -2,7 +2,7 @@ package com.kincony.KControl.net.data;
 
 import java.util.List;
 
-public class ShareQRCode {
+public class AddressBKBean {
     private List<IPAddress> allAddress;
     private List<Device> allDevice;
     private List<Scene> allScene;

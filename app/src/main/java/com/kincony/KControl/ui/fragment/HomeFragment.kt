@@ -2,12 +2,21 @@ package com.kincony.KControl.ui.fragment
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.text.TextUtils
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.PopupWindow
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentPagerAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kincony.KControl.R
+import com.kincony.KControl.camera.VideoFragment
 import com.kincony.KControl.net.KBoxCommand
 import com.kincony.KControl.net.KBoxMqttCommand
 import com.kincony.KControl.net.KCOLBMqttCommand
@@ -26,6 +35,7 @@ import com.kincony.KControl.net.usecase.KDimmerSetOneDimmerUseCase
 import com.kincony.KControl.ui.AddDeviceActivity
 import com.kincony.KControl.ui.DeviceEditActivity
 import com.kincony.KControl.ui.DeviceInPutEditActivity
+import com.kincony.KControl.ui.ScanDeviceActivity
 import com.kincony.KControl.ui.adapter.HomeSceneAdapter
 import com.kincony.KControl.ui.adapter.device.CLOBDeviceConvert
 import com.kincony.KControl.ui.adapter.device.DeviceAdapter
@@ -41,8 +51,10 @@ import org.greenrobot.eventbus.Subscribe
 import org.json.JSONObject
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.pow
 
 class HomeFragment : BaseFragment() {
+    private var cameraList: ArrayList<IPAddress>? = null
     private var deviceList: ArrayList<Device>? = null
     private var adapter: DeviceAdapter? = null
 
@@ -51,12 +63,47 @@ class HomeFragment : BaseFragment() {
     private var isSortMode = false
 
     private var lastSceneMillis: Long = 0
+    private var isVideoSwitch = true
 
     override fun getLayoutId() = R.layout.fragment_home
 
     override fun initView() {
+        cameraList = ArrayList()
         deviceList = ArrayList()
         sceneList = ArrayList()
+
+        // video ViewPager
+        clVideo.visibility = View.GONE
+        ivVideoSwitch.visibility = View.GONE
+        ivVideoSwitch.setOnClickListener {
+            if (isVideoSwitch) {
+                isVideoSwitch = false
+                clVideo.visibility = View.GONE
+                ivVideoSwitch.setImageResource(R.drawable.expander_open_holo_light)
+            } else {
+                isVideoSwitch = true
+                clVideo.visibility = View.VISIBLE
+                ivVideoSwitch.setImageResource(R.drawable.expander_close_holo_light)
+            }
+        }
+        vpVideo.adapter = object : FragmentPagerAdapter(
+            childFragmentManager,
+            BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
+        ) {
+            override fun getCount(): Int {
+                return cameraList!!.size
+            }
+
+            override fun getItem(position: Int): Fragment {
+                val ipAddress = cameraList!!.get(position)
+                return VideoFragment.newInstance(ipAddress, false);
+            }
+
+//            override fun getItemPosition(`object`: Any): Int {
+//                return PagerAdapter.POSITION_NONE
+//            }
+        }
+
         // 下拉刷新
         refresh.setOnRefreshListener {
             getAllDeviceState(true)
@@ -144,7 +191,7 @@ class HomeFragment : BaseFragment() {
                 )
             }
         }
-
+        // CLOB click event
         adapter?.clobDeviceConvert?.callback = object : CLOBDeviceConvert.Callback {
             override fun onInPutEditClick(position: Int, device: Device) {
                 DeviceInPutEditActivity.start(
@@ -233,8 +280,10 @@ class HomeFragment : BaseFragment() {
 
     @Subscribe
     public fun refreshDevice(event: RefreshAddressEvent) {
-        if (event.address != null && ProtocolType.MQTT.value == event.address.protocolType) {
-            MqttClientManager.disconnect(event.address)
+        if (event.address != null) {
+            if (ProtocolType.MQTT.value == event.address.protocolType) {
+                MqttClientManager.disconnect(event.address)
+            }
         }
         loadDevice()
     }
@@ -291,9 +340,28 @@ class HomeFragment : BaseFragment() {
             refresh.isRefreshing = false
         }
         if (event.ipAddress != null) {
-            for ((index, device) in deviceList!!.withIndex()) {
-                if (device.address.ip == event.ipAddress!!.ip) {
-                    adapter?.notifyItemChanged(index)
+            if (event.ipAddress!!.deviceType == DeviceType.CAMERA.value) {
+                if (!cameraList!!.contains(event.ipAddress!!)) {
+                    cameraList!!.add(event.ipAddress!!)
+                    vpVideo.adapter?.notifyDataSetChanged()
+                }
+                if (cameraList!!.size > 0) {
+                    if (isVideoSwitch) {
+                        clVideo.visibility = View.VISIBLE
+                        ivVideoSwitch.setImageResource(R.drawable.expander_close_holo_light)
+                    } else {
+                        ivVideoSwitch.setImageResource(R.drawable.expander_open_holo_light)
+                    }
+                    ivVideoSwitch.visibility = View.VISIBLE
+                } else {
+                    clVideo.visibility = View.GONE
+                    ivVideoSwitch.visibility = View.GONE
+                }
+            } else {
+                for ((index, device) in deviceList!!.withIndex()) {
+                    if (device.address.ip == event.ipAddress!!.ip) {
+                        adapter?.notifyItemChanged(index)
+                    }
                 }
             }
         } else {
@@ -337,6 +405,17 @@ class HomeFragment : BaseFragment() {
             }
         }
 
+        val itDevice = devices.iterator()
+        while (itDevice.hasNext()) {
+            val device = itDevice.next()
+            if (device.address.deviceType == DeviceType.CAMERA.value) {
+                itDevice.remove()
+                cameraList!!.add(device.address)
+            }
+        }
+
+        vpVideo.adapter?.notifyDataSetChanged()
+
         deviceList!!.addAll(devices)
         adapter?.notifyDataSetChanged()
         getAllDeviceState(true)
@@ -358,21 +437,32 @@ class HomeFragment : BaseFragment() {
         }
 
         KBoxDatabase.getInstance(context).addressDao.insertAddress(address)
-        val temp = if (address.protocolType == ProtocolType.MQTT.value) {
-            KBoxDatabase.getInstance(context).addressDao.getMQTTAddress(
-                address.ip,
-                address.port,
-                address.deviceType,
-                address.username,
-                address.password,
-                address.deviceId
-            )
-        } else {
-            KBoxDatabase.getInstance(context).addressDao.getTCPAddress(
-                address.ip,
-                address.port,
-                address.deviceType
-            )
+        val temp = when (address.protocolType) {
+            ProtocolType.CAMERA.value -> {
+                KBoxDatabase.getInstance(context).addressDao.getCAMERAAddress(
+                    address.deviceType,
+                    address.deviceUserName,
+                    address.devicePassword,
+                    address.deviceId
+                )
+            }
+            ProtocolType.MQTT.value -> {
+                KBoxDatabase.getInstance(context).addressDao.getMQTTAddress(
+                    address.ip,
+                    address.port,
+                    address.deviceType,
+                    address.username,
+                    address.password,
+                    address.deviceId
+                )
+            }
+            else -> {
+                KBoxDatabase.getInstance(context).addressDao.getTCPAddress(
+                    address.ip,
+                    address.port,
+                    address.deviceType
+                )
+            }
         }
         val size = deviceList!!.size
         var index = 0
@@ -475,6 +565,18 @@ class HomeFragment : BaseFragment() {
 
         deviceList!!.clear()
         deviceList!!.addAll(readList)
+        cameraList!!.clear()
+        val itDevice = deviceList!!.iterator()
+        while (itDevice.hasNext()) {
+            val device = itDevice.next()
+            if (device.address.deviceType == DeviceType.CAMERA.value) {
+                itDevice.remove()
+                cameraList!!.add(device.address)
+            }
+        }
+
+        vpVideo.adapter?.notifyDataSetChanged()
+
         adapter?.notifyDataSetChanged()
 
         getAllDeviceState(true)
@@ -756,7 +858,7 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun pow(number: Int): Int {
-        return Math.pow(2 * 1.0, number * 1.0).toInt()
+        return (2 * 1.0).pow(number * 1.0).toInt()
     }
 
     var getAllDeviceStateCount: Int = 0
@@ -774,6 +876,9 @@ class HomeFragment : BaseFragment() {
 
         refresh.isRefreshing = isRefresh
 
+        cameraList!!.clear()
+        vpVideo.adapter?.notifyDataSetChanged()
+
         for (address in allAddress) {
             when (address.deviceType) {
                 DeviceType.Relay_2.value,
@@ -783,6 +888,10 @@ class HomeFragment : BaseFragment() {
                 DeviceType.Relay_32.value -> getAllRelayState(address) { --getAllDeviceStateCount }
                 DeviceType.Dimmer_8.value -> getAllDimmerState(address) { --getAllDeviceStateCount }
                 DeviceType.COLB.value -> getAllCOLBState(address) { --getAllDeviceStateCount }
+                DeviceType.CAMERA.value -> {
+                    --getAllDeviceStateCount
+                    EventBus.getDefault().post(UpdateDeviceUI(address))
+                }
                 else -> {
                     --getAllDeviceStateCount
                     EventBus.getDefault().post(UpdateDeviceUI())
@@ -1029,11 +1138,15 @@ class HomeFragment : BaseFragment() {
                                     json.keys().forEach {
                                         if (it.contains("dimmer")) {
                                             if (it.equals("dimmer1")) {
-                                                body += "${json.optJSONObject("dimmer${temp.number}")
-                                                    ?.optString("value")}"
+                                                body += "${
+                                                    json.optJSONObject("dimmer${temp.number}")
+                                                        ?.optString("value")
+                                                }"
                                             } else {
-                                                body += ",${json.optJSONObject("dimmer${temp.number}")
-                                                    ?.optString("value")}"
+                                                body += ",${
+                                                    json.optJSONObject("dimmer${temp.number}")
+                                                        ?.optString("value")
+                                                }"
                                             }
                                         }
                                     }
@@ -1122,13 +1235,72 @@ class HomeFragment : BaseFragment() {
         }
     }
 
+
+    var addDevicePopupWindow: PopupWindow? = null
+
+
     /**
      * 添加设备弹窗
      */
     private fun showAddDeviceDialog() {
-        val intent = Intent(activity!!, AddDeviceActivity::class.java)
-        startActivityForResult(intent, 2001)
+        if (addDevicePopupWindow == null) {
+            val rootView: View =
+                LayoutInflater.from(activity!!).inflate(R.layout.pop_add_device, null, false)
+
+            rootView.findViewById<View>(R.id.tvEditDevice).setOnClickListener {
+                addDevicePopupWindow!!.dismiss()
+                val intent = Intent(activity!!, AddDeviceActivity::class.java)
+                startActivityForResult(intent, 2001)
+            }
+
+            rootView.findViewById<View>(R.id.tvScanDevice).setOnClickListener {
+                addDevicePopupWindow!!.dismiss()
+//                if (
+//                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+//                    &&
+//                    ContextCompat.checkSelfPermission(
+//                        activity!!,
+//                        Manifest.permission.ACCESS_COARSE_LOCATION
+//                    ) != PackageManager.PERMISSION_GRANTED
+//                ) {
+//                    requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 1031)
+//                    return@setOnClickListener
+//                }
+                val intent = Intent(activity!!, ScanDeviceActivity::class.java)
+                startActivityForResult(intent, 2001)
+            }
+
+            addDevicePopupWindow = PopupWindow(
+                rootView,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+
+            addDevicePopupWindow!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        }
+
+        if (addDevicePopupWindow!!.isShowing) {
+            addDevicePopupWindow!!.dismiss()
+        } else {
+            addDevicePopupWindow!!.showAsDropDown(add)
+        }
     }
+
+//    override fun onRequestPermissionsResult(
+//        requestCode: Int,
+//        permissions: Array<out String>,
+//        grantResults: IntArray
+//    ) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//        if (requestCode == 1031 && ContextCompat.checkSelfPermission(
+//                activity!!,
+//                Manifest.permission.ACCESS_COARSE_LOCATION
+//            ) == PackageManager.PERMISSION_GRANTED
+//        ) {
+//            val intent = Intent(activity!!, ScanDeviceActivity::class.java)
+//            startActivityForResult(intent, 2001)
+//        }
+//    }
 
     /**
      * 情景模式拖拽ItemTouchHelper.Callback

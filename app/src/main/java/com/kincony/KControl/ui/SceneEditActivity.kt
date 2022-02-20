@@ -87,10 +87,10 @@ class SceneEditActivity : BaseActivity() {
         }
         model.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
-                    parent: AdapterView<*>,
-                    view: View,
-                    position: Int,
-                    id: Long
+                parent: AdapterView<*>,
+                view: View,
+                position: Int,
+                id: Long
             ) {
                 when (position) {
                     0 -> {
@@ -131,7 +131,7 @@ class SceneEditActivity : BaseActivity() {
                         result = actionCode(deviceChannelList, device.address.deviceType)
                     } else {
                         result =
-                                "${result}_${actionCode(deviceChannelList, device.address.deviceType)}"
+                            "${result}_${actionCode(deviceChannelList, device.address.deviceType)}"
                     }
                 }
                 scene!!.action = result
@@ -178,7 +178,7 @@ class SceneEditActivity : BaseActivity() {
                         result = actionCode(deviceChannelList, device.address.deviceType)
                     } else {
                         result =
-                                "${result}_${actionCode(deviceChannelList, device.address.deviceType)}"
+                            "${result}_${actionCode(deviceChannelList, device.address.deviceType)}"
                     }
                 }
                 scene!!.action = result
@@ -423,13 +423,15 @@ class SceneEditActivity : BaseActivity() {
         val it = address.iterator()
         while (it.hasNext()) {
             val next = it.next()
-            if (next.deviceType == DeviceType.COLB.value) {
+            if (next.deviceType == DeviceType.COLB.value
+                || next.deviceType == DeviceType.CAMERA.value
+            ) {
                 it.remove()
             }
         }
         val items = Array<String>(address.size) { i -> address[i].toString() }
         val itemsAdapter =
-                ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
+            ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
         spinner.adapter = itemsAdapter
         if (address.size > 0) {
             addressSelected = address[0]
@@ -437,10 +439,10 @@ class SceneEditActivity : BaseActivity() {
 
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
-                    parent: AdapterView<*>,
-                    view: View,
-                    position: Int,
-                    id: Long
+                parent: AdapterView<*>,
+                view: View,
+                position: Int,
+                id: Long
             ) {
                 addressSelected = address[position]
             }
@@ -450,17 +452,17 @@ class SceneEditActivity : BaseActivity() {
             }
         }
         val dialog = AlertDialog.Builder(this)
-                .setCancelable(true)
-                .setView(view)
-                .setNegativeButton(resources.getString(R.string.cancel)) { _, _ ->
-                    addressSelected = null
+            .setCancelable(true)
+            .setView(view)
+            .setNegativeButton(resources.getString(R.string.cancel)) { _, _ ->
+                addressSelected = null
+            }
+            .setPositiveButton(resources.getString(R.string.confirm)) { _, _ ->
+                if (addressSelected != null) {
+                    addDevice(addressSelected!!)
                 }
-                .setPositiveButton(resources.getString(R.string.confirm)) { _, _ ->
-                    if (addressSelected != null) {
-                        addDevice(addressSelected!!)
-                    }
-                }
-                .create()
+            }
+            .create()
         dialog.show()
     }
 

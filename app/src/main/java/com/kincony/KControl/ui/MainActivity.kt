@@ -3,12 +3,15 @@ package com.kincony.KControl.ui
 import android.content.Context
 import android.content.Intent
 import androidx.fragment.app.Fragment
+import com.ipcamera.demo.BridgeService
 import com.kincony.KControl.R
 import com.kincony.KControl.ui.base.BaseActivity
 import com.kincony.KControl.ui.base.FragmentHolder
 import com.kincony.KControl.ui.fragment.HomeFragment
 import com.kincony.KControl.ui.fragment.SettingFragment
+import com.kincony.KControl.utils.ThreadUtils
 import kotlinx.android.synthetic.main.activity_main.*
+import vstc2.nativecaller.NativeCaller
 
 class MainActivity : BaseActivity() {
     var fragmentHome = FragmentHolder()
@@ -84,5 +87,29 @@ class MainActivity : BaseActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val intent = Intent()
+        intent.setClass(this, BridgeService::class.java)
+        startService(intent)
+        ThreadUtils.network().execute {
+            try {
+                NativeCaller.PPPPInitial("ADCBBFAOPPJAHGJGBBGLFLAGDBJJHNJGGMBFBKHIBBNKOKLDHOBHCBOEHOKJJJKJBPMFLGCPPJMJAPDOIPNL")
+                NativeCaller.PPPPNetworkDetect()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        val intent = Intent()
+        intent.setClass(this, BridgeService::class.java)
+        stopService(intent)
     }
 }

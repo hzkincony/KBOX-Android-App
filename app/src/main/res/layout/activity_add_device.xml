@@ -51,76 +51,10 @@
 
 
     <LinearLayout
-        android:layout_marginTop="@dimen/top_bar_height"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/top_bar_height"
         android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp">
-
-            <TextView
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:text="@string/label_ip"
-                android:textColor="@color/press"
-                android:textSize="16dp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/ip"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#eeeeee"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:hint="@string/ip_input"
-                android:lines="1"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:singleLine="true"
-                android:textSize="14dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal"
-            android:paddingLeft="15dp"
-            android:paddingRight="15dp">
-
-            <TextView
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:text="@string/label_port"
-                android:textColor="@color/press"
-                android:textSize="16dp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/port"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:background="#eeeeee"
-                android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:hint="@string/port_input"
-                android:inputType="number"
-                android:lines="1"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:textSize="14dp" />
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -157,6 +91,75 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/llIP"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/label_ip"
+                android:textColor="@color/press"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/ip"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#eeeeee"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:hint="@string/ip_input"
+                android:lines="1"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:singleLine="true"
+                android:textSize="14dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llPort"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/label_port"
+                android:textColor="@color/press"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/port"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#eeeeee"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:hint="@string/port_input"
+                android:inputType="number"
+                android:lines="1"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textSize="14dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llProtocol"
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:layout_marginTop="10dp"
@@ -198,7 +201,7 @@
             android:orientation="horizontal"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <TextView
                 android:layout_width="100dp"
@@ -219,9 +222,9 @@
                 android:gravity="center_vertical"
                 android:hint="@string/device_id_input"
                 android:lines="1"
-                android:singleLine="true"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
+                android:singleLine="true"
                 android:textSize="14dp" />
 
             <ImageView
@@ -231,6 +234,40 @@
                 android:layout_marginLeft="10dp"
                 android:src="@android:drawable/ic_menu_camera" />
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llDeviceUser"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/label_device_user"
+                android:textColor="@color/press"
+                android:textSize="16dp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/deviceUser"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#eeeeee"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:hint="@string/user_name_input"
+                android:lines="1"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textSize="14dp" />
         </LinearLayout>
 
         <LinearLayout
@@ -247,7 +284,7 @@
                 android:layout_width="100dp"
                 android:layout_height="match_parent"
                 android:gravity="center_vertical"
-                android:text="@string/label_topic_password"
+                android:text="@string/label_device_password"
                 android:textColor="@color/press"
                 android:textSize="16dp"
                 android:textStyle="bold" />
@@ -266,7 +303,7 @@
                 android:paddingRight="10dp"
                 android:textSize="14dp" />
         </LinearLayout>
-        
+
         <LinearLayout
             android:id="@+id/llUserName"
             android:layout_width="match_parent"
@@ -339,11 +376,11 @@
     <TextView
         android:id="@+id/add"
         android:layout_width="match_parent"
-        android:layout_gravity="bottom"
         android:layout_height="55dp"
-        android:textSize="22sp"
+        android:layout_gravity="bottom"
         android:background="#eeeeee"
         android:gravity="center"
         android:orientation="horizontal"
-        android:text="@string/confirm" />
+        android:text="@string/confirm"
+        android:textSize="22sp" />
 </FrameLayout>

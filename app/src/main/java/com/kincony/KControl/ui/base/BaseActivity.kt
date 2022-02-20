@@ -1,35 +1,51 @@
 package com.kincony.KControl.ui.base
 
+import android.app.ProgressDialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.kincony.KControl.R
 import com.kincony.KControl.utils.ToastUtils
+import kotlinx.android.synthetic.main.fragment_setting.*
 
 open abstract class BaseActivity : AppCompatActivity() {
     var mHandler = Handler()
 
     var canLoad = true
-    var loadingCreate = false
-    val loading by lazy {
-        loadingCreate = true
-        val view = LayoutInflater.from(this).inflate(R.layout.dialog_loading, null)
-        AlertDialog.Builder(this, R.style.AppTheme_Transparent)
-            .setCancelable(true)
-            .setView(view)
-            .create()
+
+    private var progressDialog: ProgressDialog? = null
+
+    public fun showProgressDialog(message: String) {
+        mHandler.post {
+            if (progressDialog == null) {
+                progressDialog = ProgressDialog(this)
+                progressDialog!!.setCanceledOnTouchOutside(false)
+                progressDialog!!.setCancelable(false)
+                progressDialog!!.setProgressStyle(ProgressDialog.STYLE_SPINNER)
+            }
+            progressDialog!!.setMessage(message)
+            if (!progressDialog!!.isShowing) {
+                progressDialog!!.show()
+            }
+        }
     }
 
-    open fun showLoading() {
-        loading?.show()
+    private val dismissProgressRunnable = Runnable {
+        mHandler.post {
+            if (progressDialog != null && progressDialog!!.isShowing) {
+                progressDialog!!.dismiss()
+            }
+        }
     }
 
-    open fun closeLoading() {
-        loading?.dismiss()
+    public fun dismissProgressDialog(delay: Long) {
+        mHandler.removeCallbacks(dismissProgressRunnable)
+        if (delay <= 0) {
+            dismissProgressRunnable.run()
+        } else {
+            mHandler.postDelayed(dismissProgressRunnable, delay)
+        }
     }
 
     fun showToast(msg: String?) {
@@ -58,11 +74,7 @@ open abstract class BaseActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (loadingCreate) {
-            if (loading?.isShowing == true) {
-                loading?.cancel()
-            }
-        }
+        dismissProgressDialog(0)
         ToastUtils.destroy(this)
     }
 }

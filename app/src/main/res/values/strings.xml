@@ -6,9 +6,9 @@
     <string name="sort">Sort</string>
 
 
-
     <string name="device">Device</string>
     <string name="edit">Edit</string>
+    <string name="edit_device">Edit Device</string>
     <string name="setting">Setting</string>
     <string name="pic">Device ICO</string>
 
@@ -65,7 +65,10 @@
     <string name="address_alert">Please enter a valid address.</string>
     <string name="device_alert">Please add device.</string>
 
+    <string name="connecting">Connecting</string>
     <string name="connect_fail">Connect fail</string>
+    <string name="connect_success">Connect success</string>
+    <string name="disconnect">Disconnect</string>
     <string name="ui_fail">UI thread can not send data.</string>
     <string name="ui_fail2">UI thread can not establish connection.</string>
 
@@ -89,6 +92,12 @@
     <string name="scan_qr_code_warn">Scan QR code</string>
     <string name="scan_qr_code_create_wrong">QR code create failed</string>
     <string name="scan_qr_code_from_wrong">Not support this QR code</string>
+    <string name="file_from_wrong">Not support this file</string>
+    <string name="data_sending">Data Sending</string>
+    <string name="data_error">Data Error</string>
+    <string name="data_loading">Data Loading</string>
+    <string name="data_empty">Data Empty</string>
+    <string name="add_data_success">Add Data Success</string>
     <string name="scan_qr_code_from_album_wrong">Can\'t fine QR code</string>
     <string name="load_address">Restore the original phone</string>
     <string name="share_address">Share</string>
@@ -105,9 +114,11 @@
     <string name="label_model">Model:</string>
     <string name="label_protocol">Protocol:</string>
     <string name="label_device_id">Device ID:</string>
-    <string name="label_topic_password">Device Pwd:</string>
+    <string name="label_device_user">Device User:</string>
+    <string name="label_device_password">Device Pwd:</string>
     <string name="label_user_name">MQTT User:</string>
     <string name="label_password">MQTT Pwd:</string>
+    <string name="label_name">Name:</string>
 
     <string name="label_max">Max:</string>
     <string name="label_min">Min:</string>
@@ -117,4 +128,16 @@
     <string name="save_success">save success</string>
     <string name="save_fail">save fail</string>
 
+    <string name="scan_device">Scan Device</string>
+    <string name="scan_success">Scan Success</string>
+    <string name="scan_result_null">Scan Device Empty</string>
+
+    <string name="low">Low</string>
+    <string name="middle">Middle</string>
+    <string name="high">High</string>
+    <string name="scan_qr_code_tips">All mobile phone connect with same wifi then other phone scan qrcode to restore</string>
+
+    <string name="qr_code">QR Code</string>
+    <string name="file">File</string>
+    <string name="the_file_is_too_large">The file is too large</string>
 </resources>

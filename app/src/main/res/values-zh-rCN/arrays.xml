@@ -8,11 +8,16 @@
         <item>32路继电器</item>
         <item>8调光器</item>
         <item>COLB</item>
+        <item>摄像头</item>
     </string-array>
 
     <string-array name="protocol">
         <item>TCP</item>
         <item>MQTT</item>
+    </string-array>
+
+    <string-array name="protocolCamera">
+        <item>CAMERA</item>
     </string-array>
 
     <string-array name="mode">

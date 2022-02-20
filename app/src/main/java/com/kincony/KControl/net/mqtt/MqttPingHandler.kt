@@ -30,10 +30,10 @@ internal class MqttPingHandler(
         }
         val message = msg
         if (message.fixedHeader().messageType() == MqttMessageType.PINGREQ) {
-            LogUtils.d("MQTT[${client.clientId}] PINGREQ ${msg}")
+            com.kincony.KControl.utils.LogUtils.d("MQTT[${client.clientId}] PINGREQ ${msg}")
             handlePingReq(ctx.channel())
         } else if (message.fixedHeader().messageType() == MqttMessageType.PINGRESP) {
-            LogUtils.d("MQTT[${client.clientId}] PINGRESP ${msg}")
+            com.kincony.KControl.utils.LogUtils.d("MQTT[${client.clientId}] PINGRESP ${msg}")
             handlePingResp()
         } else {
             ctx.fireChannelRead(ReferenceCountUtil.retain<Any>(msg))

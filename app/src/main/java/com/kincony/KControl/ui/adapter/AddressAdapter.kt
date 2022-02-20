@@ -20,12 +20,24 @@ class AddressAdapter : BaseQuickAdapter<IPAddress, BaseViewHolder> {
         )
         helper.setText(
             R.id.deviceType,
-            "${helper.itemView.context.getString(R.string.label_model)}${item.getDeviceTypeName(helper.itemView.context)}"
+            "${helper.itemView.context.getString(R.string.label_model)}${
+                item.getDeviceTypeName(
+                    helper.itemView.context
+                )
+            }"
         )
         helper.setText(
             R.id.protocolType,
-            "${helper.itemView.context.getString(R.string.label_protocol)}:${item.getProtocolTypeName()}"
+            "${helper.itemView.context.getString(R.string.label_protocol)}${item.getProtocolTypeName()}"
         )
+
+        if (ProtocolType.CAMERA.value == item.protocolType) {
+            helper.setText(
+                R.id.address,
+                "${helper.itemView.context.getString(R.string.label_address)}${item.deviceId}"
+            )
+        }
+
         if (ProtocolType.MQTT.value == item.protocolType) {
             helper.setVisible(R.id.deviceId, true)
             helper.setVisible(R.id.userName, true)

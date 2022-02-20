@@ -1,9 +1,7 @@
 package com.kincony.KControl.ui
 
 import android.Manifest
-import android.content.ContentValues
-import android.content.Context
-import android.content.Intent
+import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -14,23 +12,29 @@ import android.provider.MediaStore
 import android.text.TextUtils
 import android.view.LayoutInflater
 import android.widget.ImageView
+import android.widget.PopupWindow
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.gson.JsonObject
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 import com.kincony.KControl.R
-import com.kincony.KControl.net.data.IPAddress
-import com.kincony.KControl.net.data.RefreshAddressEvent
-import com.kincony.KControl.net.data.RefreshSceneEvent
-import com.kincony.KControl.net.data.ShareQRCode
+import com.kincony.KControl.net.data.*
 import com.kincony.KControl.net.data.database.KBoxDatabase
+import com.kincony.KControl.net.socket.NettyServer
 import com.kincony.KControl.ui.adapter.AddressAdapter
 import com.kincony.KControl.ui.base.BaseActivity
+import com.kincony.KControl.utils.ThreadUtils
 import com.kincony.KControl.utils.ToastUtils
 import com.kincony.KControl.utils.Tools
+import com.kincony.KControl.wifi.WifiLManager
+import com.kincony.KControl.wifi.WifiTransferConfig
+import io.netty.channel.Channel
 import kotlinx.android.synthetic.main.activity_address.*
+import kotlinx.android.synthetic.main.activity_address.recycler
+import kotlinx.android.synthetic.main.fragment_home.*
 import org.greenrobot.eventbus.EventBus
 import java.io.BufferedOutputStream
 import java.io.File
@@ -39,7 +43,9 @@ import java.io.OutputStream
 import java.util.*
 import kotlin.collections.ArrayList
 
+
 class AddressActivity : BaseActivity() {
+    var nettyServer: NettyServer? = null
     var list = ArrayList<IPAddress>()
     var adapter = AddressAdapter()
 
@@ -60,11 +66,11 @@ class AddressActivity : BaseActivity() {
         }
 
         iv_qr_code.setOnClickListener {
-            showQRCodeView()
+            showBKDialog()
         }
 
         tv_qr_code.setOnClickListener {
-            showQRCodeView()
+            showBKDialog()
         }
 
         recycler.adapter = adapter
@@ -80,15 +86,19 @@ class AddressActivity : BaseActivity() {
         }
     }
 
-    private fun showQRCodeView() {
+    private fun getAddressBKContent(): String {
         val allAddress = KBoxDatabase.getInstance(this).addressDao.allAddress
         val allDevice = KBoxDatabase.getInstance(this).deviceDao.allDevice
         val allScene = KBoxDatabase.getInstance(this).sceneDao.allScene
-        val shareQRCode = ShareQRCode()
-        shareQRCode.allAddress = allAddress
-        shareQRCode.allScene = allScene
-        shareQRCode.allDevice = allDevice
-        val content = Tools.zip(Tools.gson.toJson(shareQRCode))
+        val addressBKBean = AddressBKBean()
+        addressBKBean.allAddress = allAddress
+        addressBKBean.allScene = allScene
+        addressBKBean.allDevice = allDevice
+        return Tools.zip(Tools.gson.toJson(addressBKBean))
+    }
+
+    private fun showQRCodeView() {
+        val content = getAddressBKContent()
         val bitmap =
             createQRCodeBitmap(
                 content,
@@ -128,6 +138,178 @@ class AddressActivity : BaseActivity() {
                 }
                 .create()
                 .show()
+        } else {
+            ToastUtils.showToastLong(getString(R.string.scan_qr_code_create_wrong))
+        }
+    }
+
+    var bkPopupWindow: PopupWindow? = null
+
+    private fun showBKDialog() {
+//        if (bkPopupWindow == null) {
+//            val rootView: View =
+//                LayoutInflater.from(this).inflate(R.layout.pop_bk_device, null, false)
+//
+//            rootView.findViewById<View>(R.id.tvQRCode).setOnClickListener {
+//                bkPopupWindow!!.dismiss()
+        showQRCodeView2()
+//            }
+//
+//            rootView.findViewById<View>(R.id.tvFile).setOnClickListener {
+//                bkPopupWindow!!.dismiss()
+//                showBKFileDialog();
+//            }
+//
+//            bkPopupWindow = PopupWindow(
+//                rootView,
+//                ViewGroup.LayoutParams.WRAP_CONTENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT
+//            )
+//
+//            bkPopupWindow!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+//        }
+//
+//        if (bkPopupWindow!!.isShowing) {
+//            bkPopupWindow!!.dismiss()
+//        } else {
+//            bkPopupWindow!!.showAsDropDown(iv_qr_code)
+//        }
+    }
+
+    private fun showBKFileDialog() {
+        var outputStream: OutputStream? = null
+        var uri: Uri? = null
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                val contentValues = ContentValues()
+                contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, "KBox-Device.BK")
+                contentValues.put(
+                    MediaStore.MediaColumns.RELATIVE_PATH,
+                    Environment.DIRECTORY_DOWNLOADS
+                )
+                uri =
+                    contentResolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+                if (uri != null) {
+                    outputStream = contentResolver.openOutputStream(uri)
+                }
+            } else {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(
+                        this@AddressActivity,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    requestPermissions(
+                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                        1001
+                    )
+                    return
+                }
+                val file = File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                    "KBox-Device.BK"
+                )
+                uri = Uri.fromFile(file)
+                outputStream = FileOutputStream(file)
+            }
+            outputStream?.write(getAddressBKContent().toByteArray())
+            if (TextUtils.isEmpty(uri?.path)) {
+                throw RuntimeException("path is null")
+            } else {
+                AlertDialog.Builder(this)
+                    .setCancelable(true)
+                    .setTitle("生成文件成功")
+                    .setMessage("/Download/KBox-Device.BK")
+                    .setPositiveButton(getString(R.string.confirm), null)
+                    .create()
+                    .show()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            AlertDialog.Builder(this)
+                .setCancelable(true)
+                .setMessage("生成文件失败")
+                .setPositiveButton(getString(R.string.confirm), null)
+                .create()
+                .show()
+        } finally {
+            Tools.close(outputStream)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(
+                this@AddressActivity,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            showBKFileDialog()
+        }
+    }
+
+    private fun showQRCodeView2() {
+        val localIp = WifiLManager.getLocalIpAddress(this);
+        val jsonObject = JsonObject()
+        jsonObject.addProperty("kbox_qrcode", "v2")
+        jsonObject.addProperty("ip", localIp);
+        jsonObject.addProperty("port", WifiTransferConfig.PORT);
+        val bitmap =
+            createQRCodeBitmap(
+                Tools.zip(jsonObject.toString()),
+                480,
+                480,
+                "UTF-8",
+                "L",
+                "1",
+                Color.BLACK,
+                Color.WHITE
+            )
+        if (bitmap != null) {
+            if (nettyServer != null) nettyServer!!.stopServer()
+            nettyServer = NettyServer()
+            nettyServer!!.setCallback(object : NettyServer.Callback {
+                override fun onStartSuccess() {
+                    val view =
+                        LayoutInflater.from(this@AddressActivity)
+                            .inflate(R.layout.dialog_qrcode2, null)
+                    view.findViewById<ImageView>(R.id.qr_code).setImageBitmap(bitmap)
+                    AlertDialog.Builder(this@AddressActivity)
+                        .setCancelable(true)
+                        .setView(view)
+                        .setPositiveButton(resources.getString(R.string.confirm)) { dialog, _ -> nettyServer?.stopServer() }
+                        .create()
+                        .show()
+                }
+
+                override fun onStartError(throwable: Throwable?) {
+                    ToastUtils.showToastLong(getString(R.string.scan_qr_code_create_wrong))
+                }
+
+                override fun onActive(channel: Channel?) {
+                    ThreadUtils.io().execute {
+                        showProgressDialog(getString(R.string.connect_success))
+                        channel?.writeAndFlush(getAddressBKContent())
+                        dismissProgressDialog(0)
+                    }
+                }
+
+                override fun onInactive(channel: Channel?) {
+
+                }
+
+                override fun onError(channel: Channel?, throwable: Throwable?) {
+                    ToastUtils.showToastShort(throwable.toString())
+                }
+
+                override fun onRead(channel: Channel?, message: String?) {
+
+                }
+            })
+            nettyServer!!.startServer(WifiTransferConfig.PORT)
         } else {
             ToastUtils.showToastLong(getString(R.string.scan_qr_code_create_wrong))
         }

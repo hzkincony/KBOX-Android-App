@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/play"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <android.opengl.GLSurfaceView
+        android:id="@+id/glSurfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center" />
+
+    <RelativeLayout
+        android:id="@+id/rlControl"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/ivBack"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="15dp"
+            android:paddingLeft="5dp"
+            android:paddingTop="10dp"
+            android:paddingRight="5dp"
+            android:paddingBottom="10dp"
+            android:src="@drawable/ic_back"
+            app:tint="@color/video_btn" />
+
+        <ImageView
+            android:id="@+id/ivAudio"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="15dp"
+            android:layout_marginBottom="15dp"
+            android:src="@drawable/ptz_audio_off"
+            app:tint="@color/video_btn" />
+
+        <ImageView
+            android:id="@+id/ivTalk"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="20dp"
+            android:layout_marginBottom="15dp"
+            android:layout_toEndOf="@id/ivAudio"
+            android:src="@drawable/ptz_microphone_off"
+            app:tint="@color/video_btn" />
+
+        <TextView
+            android:id="@+id/tvVideoQuality"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="20dp"
+            android:background="@color/video_btn"
+            android:gravity="center"
+            android:text="@string/high"
+            android:textColor="@color/white" />
+
+        <RelativeLayout
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="30dp"
+            android:layout_marginBottom="20dp">
+
+            <ImageView
+                android:id="@+id/ivUp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/img_camera_up"
+                app:tint="@color/video_btn" />
+
+            <ImageView
+                android:id="@+id/ivLeft"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/img_camera_left"
+                app:tint="@color/video_btn" />
+
+            <ImageView
+                android:id="@+id/ivDown"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:src="@drawable/img_camera_down"
+                app:tint="@color/video_btn" />
+
+            <ImageView
+                android:id="@+id/ivRight"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/img_camera_right"
+                app:tint="@color/video_btn" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/llProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:indeterminateBehavior="repeat"
+            android:indeterminateDrawable="@drawable/loading_progress"
+            android:indeterminateDuration="2"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/connecting"
+            android:textColor="@color/video_btn" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivPlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="@color/video_btn"
+        android:scaleType="center"
+        android:src="@android:drawable/ic_media_play" />
+
+</FrameLayout>

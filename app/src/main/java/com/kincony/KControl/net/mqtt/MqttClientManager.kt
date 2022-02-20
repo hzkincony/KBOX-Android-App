@@ -119,7 +119,7 @@ object MqttClientManager {
             override fun onSuccess(client: MqttClient) {
                 mainThread.postDelayed({
                     lastPublishCount--
-                    LogUtils.d("MQTT[${client.clientId}] PUBLISH ${topic} ${message}")
+                    com.kincony.KControl.utils.LogUtils.d("MQTT[${client.clientId}] PUBLISH ${topic} ${message}")
                     client.publish(topic, message, isIgnore)
                 }, 300L * lastPublishCount++)
 

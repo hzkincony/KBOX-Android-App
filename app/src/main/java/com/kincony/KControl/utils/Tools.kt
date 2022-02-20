@@ -98,12 +98,14 @@ object Tools {
             DeviceType.Relay_32.value -> DeviceType.Relay_32
             DeviceType.Dimmer_8.value -> DeviceType.Dimmer_8
             DeviceType.COLB.value -> DeviceType.COLB
+            DeviceType.CAMERA.value -> DeviceType.CAMERA
             else -> DeviceType.Unknown
         }
     }
 
     fun getProtocolTypeEnum(protocolType: Int): ProtocolType {
         return when (protocolType) {
+            ProtocolType.CAMERA.value -> ProtocolType.CAMERA
             ProtocolType.MQTT.value -> ProtocolType.MQTT
             else -> ProtocolType.TCP
         }

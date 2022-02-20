@@ -8,11 +8,16 @@
         <item>32 Channel Relay</item>
         <item>8 Channel Dimmer</item>
         <item>COLB</item>
+        <item>CAMERA</item>
     </string-array>
 
     <string-array name="protocol">
         <item>TCP</item>
         <item>MQTT</item>
+    </string-array>
+
+    <string-array name="protocolCamera">
+        <item>CAMERA</item>
     </string-array>
 
     <string-array name="mode">
