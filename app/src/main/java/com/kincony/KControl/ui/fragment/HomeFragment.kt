@@ -394,6 +394,8 @@ class HomeFragment : BaseFragment() {
     private fun loadDevice() {
         deviceList!!.clear()
         adapter?.notifyDataSetChanged()
+        cameraList!!.clear()
+        vpVideo.adapter?.notifyDataSetChanged()
 
         val devices = KBoxDatabase.getInstance(context).deviceDao.allDevice
         val address = KBoxDatabase.getInstance(context).addressDao.allAddress
@@ -413,11 +415,11 @@ class HomeFragment : BaseFragment() {
                 cameraList!!.add(device.address)
             }
         }
-
         vpVideo.adapter?.notifyDataSetChanged()
 
         deviceList!!.addAll(devices)
         adapter?.notifyDataSetChanged()
+
         getAllDeviceState(true)
     }
 

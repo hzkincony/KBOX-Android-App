@@ -377,7 +377,10 @@ class SettingFragment : BaseFragment() {
                 AlertDialog.Builder(activity!!)
                     .setTitle(getString(R.string.add_already))
                     .setMessage(message)
-                    .setPositiveButton(getString(R.string.confirm), null)
+                    .setPositiveButton(getString(R.string.confirm)) { dialog, which ->
+                        EventBus.getDefault().post(RefreshAddressEvent(null))
+                        EventBus.getDefault().post(RefreshSceneEvent())
+                    }
                     .create()
                     .show()
             }

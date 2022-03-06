@@ -32,7 +32,7 @@ object LogUtils {
                 Log.println(priority, tag, msg)
             }
         }
-        if (FILE) {
+        if (FILE && App.application != null) {
             if (logFile == null) {
                 logFile = File(App.application.externalCacheDir, "log.txt")
             }

@@ -368,6 +368,15 @@ class AddDeviceActivity : BaseActivity() {
                     val protocolArray = resources.getStringArray(R.array.protocol)
                     for ((index, item) in protocolArray.withIndex()) {
                         if (item == Tools.getProtocolTypeEnum(selectedProtocolType).protocolTypeName) {
+                            val adapter: ArrayAdapter<CharSequence> = ArrayAdapter(
+                                this@AddDeviceActivity,
+                                android.R.layout.simple_spinner_item,
+                                resources.getTextArray(R.array.protocol)
+                            )
+                            adapter.setDropDownViewResource(R.layout.support_simple_spinner_dropdown_item)
+                            protocol.adapter = adapter
+                            protocol.onItemSelectedListener = onItemSelectedListener
+                            protocol.isEnabled = false
                             protocol.setSelection(index)
                         }
                     }
